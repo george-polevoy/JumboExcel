@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.Remoting;
 using JumboExcel.Styling;
 using NUnit.Framework;
 
@@ -49,18 +50,27 @@ namespace JumboExcel
 
             Console.WriteLine(items.Length);
 
-            var cellStyleDefinitions = new HashSet<CellStyleDefinition>(items);
-
             foreach (var left in items)
             {
+                Assert.IsFalse(left.Equals(null));
                 foreach (var right in items)
                 {
                     if (ReferenceEquals(left, right))
-                        continue;
-
-                    Assert.AreNotEqual(left, right);
+                    {
+                        Assert.IsTrue(left.Equals(right));
+                        Assert.IsTrue(right.Equals(left));
+                        Assert.AreEqual(left.GetHashCode(), right.GetHashCode());
+                    }
+                    else
+                    {
+                        Assert.AreNotEqual(left, right);
+                    }
                 }
             }
+
+            var distinctHashCodes = items.Select(i => i.GetHashCode()).Distinct().Count();
+            Console.WriteLine("Inequal items count: {0}, Distinct hash codes: {1}", items.Length, distinctHashCodes);
+            Assert.IsTrue(distinctHashCodes > items.Length * 0.6);
         }
     }
 }
