@@ -168,12 +168,12 @@ namespace JumboExcel
                     yield return RowForType(new DecimalCellElement(value), GetNoStyleComment(value.ToString(CultureInfo.InvariantCulture)));
                 }
             }
-            
+
+            var dateValue = new DateTime(2014, 12, 29, 16, 35, 56).AddMilliseconds(125);
+            yield return RowForType(new DateTimeCellElement(dateValue), GetNoStyleComment(dateValue.ToString("u")));
             foreach (var format in DateTimeFormat.GetDateTimeFormats())
             {
-                var value = new DateTime(2014, 12, 29, 16, 35, 56).AddMilliseconds(125);
-                yield return RowForType(new DateTimeCellElement(value, new DateStyleDefinition(format, null, BorderDefinition.None, null)), GetValueFormatComment(format, value.ToString("u")));
-                yield return RowForType(new DateTimeCellElement(value), GetNoStyleComment(value.ToString("u")));
+                yield return RowForType(new DateTimeCellElement(dateValue, new DateStyleDefinition(format, null, BorderDefinition.None, null)), GetValueFormatComment(format, dateValue.ToString("u")));
             }
         }
 

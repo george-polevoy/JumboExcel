@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Spreadsheet;
+using JumboExcel.Formatting;
 using JumboExcel.Structure;
 using JumboExcel.Styling;
 
@@ -16,12 +17,14 @@ namespace JumboExcel
         private readonly SharedElementCollection<string> sharedStringCollection;
 
         private readonly SharedCellStyleCollection cellStyleDefinitions;
-        
+
         private readonly Cell sharedSampleCell = new Cell();
 
         private readonly CellValue sharedSampleCellValue = new CellValue();
 
         private readonly Cell sharedSampleNumberCell = new Cell {DataType = new EnumValue<CellValues>(CellValues.Number)};
+
+        private Cell sharedSampleDateTimeCell;
 
         private Cell sharedSampleSharedStringCell;
 
@@ -39,7 +42,15 @@ namespace JumboExcel
         {
             get
             {
-                return sharedSampleSharedStringCell ?? (sharedSampleSharedStringCell = cellStyleDefinitions.AllocateCell(new SharedStringStyleDefinition(null, BorderDefinition.None, null), CellValues.SharedString));
+                return sharedSampleSharedStringCell ?? (sharedSampleSharedStringCell = cellStyleDefinitions.AllocateSharedStringCell(new SharedStringStyleDefinition(null, BorderDefinition.None, null), CellValues.SharedString));
+            }
+        }
+
+        Cell SharedSampleDateTimeCell
+        {
+            get
+            {
+                return sharedSampleDateTimeCell ?? (sharedSampleDateTimeCell = cellStyleDefinitions.AllocateDateCell(new DateStyleDefinition(DateTimeFormat.DateMmDdYy, null, BorderDefinition.None, null), CellValues.Number));
             }
         }
 
@@ -47,7 +58,7 @@ namespace JumboExcel
         {
             get
             {
-                return sharedSampleInlineStringCell ?? (sharedSampleInlineStringCell = cellStyleDefinitions.AllocateCell(new StringStyleDefinition(null, BorderDefinition.None, null), CellValues.InlineString));
+                return sharedSampleInlineStringCell ?? (sharedSampleInlineStringCell = cellStyleDefinitions.AllocateStringCell(new StringStyleDefinition(null, BorderDefinition.None, null), CellValues.InlineString));
             }
         }
 
@@ -135,7 +146,7 @@ namespace JumboExcel
 
         public void Visit(IntegerCellElement integerCellElement)
         {
-            var sampleCell = integerCellElement.Style == null ? sharedSampleNumberCell : cellStyleDefinitions.AllocateCell(integerCellElement.Style, CellValues.Number);
+            var sampleCell = integerCellElement.Style == null ? sharedSampleNumberCell : cellStyleDefinitions.AllocateNumberCell(integerCellElement.Style, CellValues.Number);
             using (new WriterScope(writer, sampleCell))
             using (new WriterScope(writer, sharedSampleCellValue))
             {
@@ -146,7 +157,7 @@ namespace JumboExcel
         
         public void Visit(DecimalCellElement decimalCellElement)
         {
-            var sampleCell = decimalCellElement.Style == null ? sharedSampleNumberCell : cellStyleDefinitions.AllocateCell(decimalCellElement.Style, CellValues.Number);
+            var sampleCell = decimalCellElement.Style == null ? sharedSampleNumberCell : cellStyleDefinitions.AllocateNumberCell(decimalCellElement.Style, CellValues.Number);
             using (new WriterScope(writer, sampleCell))
             using (new WriterScope(writer, sharedSampleCellValue))
             {
@@ -157,7 +168,7 @@ namespace JumboExcel
 
         public void Visit(DateTimeCellElement dateTimeCellElement)
         {
-            var sampleCell = dateTimeCellElement.Style == null ? sharedSampleNumberCell : cellStyleDefinitions.AllocateCell(dateTimeCellElement.Style, CellValues.Number);
+            var sampleCell = dateTimeCellElement.Style == null ? SharedSampleDateTimeCell : cellStyleDefinitions.AllocateDateCell(dateTimeCellElement.Style, CellValues.Number);
             using (new WriterScope(writer, sampleCell))
             using (new WriterScope(writer, sharedSampleCellValue))
             {
@@ -168,7 +179,7 @@ namespace JumboExcel
 
         public void Visit(InlineStringElement inlineStringElement)
         {
-            var sampleCell = inlineStringElement.Style == null ? SharedSampleInlineStringCell : cellStyleDefinitions.AllocateCell(inlineStringElement.Style, CellValues.InlineString);
+            var sampleCell = inlineStringElement.Style == null ? SharedSampleInlineStringCell : cellStyleDefinitions.AllocateStringCell(inlineStringElement.Style, CellValues.InlineString);
             using (new WriterScope(writer, sampleCell))
             using (new WriterScope(writer, sharedSampleInlineString))
             using (new WriterScope(writer, sharedSampleText))
@@ -179,7 +190,7 @@ namespace JumboExcel
 
         public void Visit(SharedStringElement sharedStringElement)
         {
-            var sampleCell = sharedStringElement.Style == null ? SharedSampleSharedStringCell : cellStyleDefinitions.AllocateCell(sharedStringElement.Style, CellValues.SharedString);
+            var sampleCell = sharedStringElement.Style == null ? SharedSampleSharedStringCell : cellStyleDefinitions.AllocateSharedStringCell(sharedStringElement.Style, CellValues.SharedString);
             using (new WriterScope(writer, sampleCell))
             using (new WriterScope(writer, sharedSampleCellValue))
             {
