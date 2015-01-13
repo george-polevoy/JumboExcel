@@ -19,31 +19,6 @@ namespace JumboExcel.Formatting
         }
 
         /// <summary>
-        /// Predefined number format <c>General</c>.
-        /// </summary>
-        public static readonly IntegerFormat General = new IntegerFormat(0, "General");
-
-        /// <summary>
-        /// Predefined number format <c>#,##0 ;(#,##0)</c>.
-        /// </summary>
-        public static readonly CommonValueFormat Undefined37 = new CommonValueFormat(37, "#,##0 ;(#,##0)");
-
-        /// <summary>
-        /// Predefined number format <c>#,##0 ;[Red](#,##0)</c>.
-        /// </summary>
-        public static readonly CommonValueFormat Undefined38 = new CommonValueFormat(38, "#,##0 ;[Red](#,##0)");
-
-        /// <summary>
-        /// Predefined number format <c>#,##0.00;(#,##0.00)</c>.
-        /// </summary>
-        public static readonly CommonValueFormat Undefined39 = new CommonValueFormat(39, "#,##0.00;(#,##0.00)");
-
-        /// <summary>
-        /// Predefined number format <c>#,##0.00;[Red](#,##0.00)</c>.
-        /// </summary>
-        public static readonly CommonValueFormat Undefined40 = new CommonValueFormat(40, "#,##0.00;[Red](#,##0.00)");
-
-        /// <summary>
         /// Predefined number format <c>@</c>.
         /// </summary>
         public static readonly CommonValueFormat String = new CommonValueFormat(49, "@");
@@ -51,14 +26,16 @@ namespace JumboExcel.Formatting
         internal static IEnumerable<CommonValueFormat> GetFormats()
         {
             return new[] {
-                General,
-                IntegerFormat.GeneralValue,
+                NumberFormat.Default,
+                IntegerFormat.General,
                 DecimalFormat.FractionalTwoDecimalPlaces,
                 IntegerFormat.IntegerWithSeparator,
                 DecimalFormat.SeparatorTwoDecimalPlaces,
                 DecimalFormat.IntegerPercents,
                 DecimalFormat.PercentsTwoDecimalPlaces,
-                DecimalFormat.ValueWithExponent1, DecimalFormat.FractionWithDenominator, DecimalFormat.FractionWithDenominatorPrecise,
+                DecimalFormat.ValueWithExponent1,
+                DecimalFormat.FractionWithDenominator,
+                DecimalFormat.FractionWithDenominatorPrecise,
                 DateTimeFormat.DateMmDdYy,
                 DateTimeFormat.DateDMmmYy,
                 DateTimeFormat.DateDMmm,
@@ -68,10 +45,10 @@ namespace JumboExcel.Formatting
                 DateTimeFormat.Time24,
                 DateTimeFormat.Time24WithSeconds,
                 DateTimeFormat.DateTime,
-                Undefined37,
-                Undefined38,
-                Undefined39,
-                Undefined40,
+                IntegerFormat.AccountingAmount,
+                IntegerFormat.AccountingAmountColored,
+                DecimalFormat.AccountingAmount,
+                DecimalFormat.AccountingAmountColored,
                 DateTimeFormat.TimeMmSs,
                 DateTimeFormat.TimeHMmSs,
                 DateTimeFormat.TimeMmSs0,

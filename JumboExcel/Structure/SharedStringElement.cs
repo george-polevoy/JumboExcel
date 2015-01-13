@@ -2,6 +2,10 @@ using JumboExcel.Styling;
 
 namespace JumboExcel.Structure
 {
+    /// <summary>
+    /// Represents shared string.
+    /// </summary>
+    /// <remarks>http://stackoverflow.com/questions/6468783/what-is-the-difference-between-cellvalues-inlinestring-and-cellvalues-string-in</remarks>
     public class SharedStringElement : CellElement
     {
         public override string ToString()

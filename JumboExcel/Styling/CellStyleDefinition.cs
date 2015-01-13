@@ -1,25 +1,26 @@
 using System;
 using System.Drawing;
+using JumboExcel.Formatting;
 
 namespace JumboExcel.Styling
 {
     public sealed class NumberStyleDefinition : CellStyleDefinition
     {
-        public NumberStyleDefinition(string format, FontDefinition fontDefinition, BorderDefinition borderDefinition, Color? fillColor) : base(fontDefinition, borderDefinition, fillColor, format)
+        public NumberStyleDefinition(NumberFormat format, FontDefinition fontDefinition, BorderDefinition borderDefinition, Color? fillColor) : base(fontDefinition, borderDefinition, fillColor, format.FormatCode)
         {
         }
     }
 
     public sealed class DateStyleDefinition : CellStyleDefinition
     {
-        public DateStyleDefinition(string dateTimeFormat, FontDefinition fontDefinition, BorderDefinition borderDefinition, Color? fillColor) : base(fontDefinition, borderDefinition, fillColor, dateTimeFormat)
+        public DateStyleDefinition(DateTimeFormat format, FontDefinition fontDefinition, BorderDefinition borderDefinition, Color? fillColor) : base(fontDefinition, borderDefinition, fillColor, format.FormatCode)
         {
         }
     }
 
     public sealed class StringStyleDefinition : CellStyleDefinition
     {
-        public StringStyleDefinition(FontDefinition fontDefinition, BorderDefinition borderDefinition, Color? fillColor) : base(fontDefinition, borderDefinition, fillColor)
+        public StringStyleDefinition(FontDefinition fontDefinition, BorderDefinition borderDefinition, Color? fillColor) : base(fontDefinition, borderDefinition, fillColor, CommonValueFormat.String.FormatCode)
         {
         }
     }
@@ -27,7 +28,7 @@ namespace JumboExcel.Styling
     public sealed class SharedStringStyleDefinition : CellStyleDefinition
     {
         public SharedStringStyleDefinition(FontDefinition fontDefinition, BorderDefinition borderDefinition, Color? fillColor)
-            : base(fontDefinition, borderDefinition, fillColor)
+            : base(fontDefinition, borderDefinition, fillColor, CommonValueFormat.String.FormatCode)
         {
         }
     }

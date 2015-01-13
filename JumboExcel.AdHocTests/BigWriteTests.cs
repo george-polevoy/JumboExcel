@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using JumboExcel.Formatting;
@@ -18,6 +19,7 @@ namespace JumboExcel
         {
             var mediumColumns = new WorksheetParametersElement(false, false, Enumerable.Range(0, 20).Select(column => new ColumnElement(column, column, 30)));
             var columnsForFonts = new WorksheetParametersElement(false, false, new ColumnElement(0, 0, 50), new ColumnElement(1, 1, 120));
+
             WriteAndExecuteExcel(new[]
             {
                 new WorksheetElement("Data Types", mediumColumns, GetDataTypeRows()),
@@ -62,7 +64,7 @@ namespace JumboExcel
                     .Concat(Enumerable.Range(0, columnCount).SelectMany(column => new CellElement[]
                     {
                         new SharedStringElement("Column: " + column),
-                        new EmptyCellElement(),
+                        EmptyCellElement.Instance,
                         new IntegerCellElement(row*column + sheet),
                         new DecimalCellElement((decimal) column/columnCount),
                         new InlineStringElement("Row: " + row*column),
@@ -136,43 +138,58 @@ namespace JumboExcel
             yield return RowForType(new InlineStringElement(null), "With a null value.");
             yield return RowForType(new SharedStringElement("It's a shared string."));
             yield return RowForType(new SharedStringElement(null), "With a null value.");
-            yield return RowForType(new IntegerCellElement(1234567890L), "Int64 with int value.");
-            yield return RowForType(new DecimalCellElement(1234567890m), "Decimal with int value.");
-            yield return RowForType(new DecimalCellElement(12345.12345m), "With fractional part.");
-            yield return RowForNumberStyle(12345.12345m, DecimalFormat.ValueWithExponent1, "Value with exponent.");
-            yield return RowForNumberStyle(12345.12345m, DecimalFormat.FractionWithDenominator, "Fraction with denominator.");
-            yield return RowForNumberStyle(12345.12345m, DecimalFormat.FractionWithDenominatorPrecise, "Fraction with denominator (precise).");
-            yield return RowForNumberStyle(12345.12345m, DecimalFormat.FractionalTwoDecimalPlaces, "Two decimal places.");
-            yield return RowForNumberStyle(0.12345m, DecimalFormat.PercentsTwoDecimalPlaces, "12.345%, two decimal places.");
-            yield return RowForNumberStyle(1234567890.12345m, DecimalFormat.SeparatorTwoDecimalPlaces, "With separator, two decimal places.");
-            yield return RowForNumberStyle(0.12345m, DecimalFormat.IntegerPercents, "12.345%, integer part.");
-            yield return RowForNumberStyle(1.12345m, DecimalFormat.PercentsTwoDecimalPlaces, "112.34%.");
-            yield return RowForNumberStyle(1.12345m, DecimalFormat.IntegerPercents, "Percent, large, integer part.");
-            var rur = new NumberStyleDefinition("#,#0.00\"\u20BD\"", null, BorderDefinition.None, null);
-            var usd = new NumberStyleDefinition("\"$\"#,#0.00", null, BorderDefinition.None, null);
-            var conditional = new NumberStyleDefinition("\"positive\"* [Green]#,##0.00;\"negative\"* [Red]-#,##0.00;\"zero\"* [Blue]#,##0.00", null, BorderDefinition.None, null);
+            yield return RowForType(new SharedStringElement("123"), "Shared string, with a number-like value. Will produce a warning.");
+            yield return RowForType(new InlineStringElement("123"), "Inline string, with a number-like value. Will produce a warning.");
+            var rur = new NumberStyleDefinition(NumberFormat.FromFormatString("#,#0.00\"\u20BD\""), null, BorderDefinition.None, null);
+            var usd = new NumberStyleDefinition(NumberFormat.FromFormatString("\"$\"#,#0.00"), null, BorderDefinition.None, null);
+            var conditional = new NumberStyleDefinition(NumberFormat.FromFormatString("\"positive\"* [Green]#,##0.00;\"negative\"* [Red]-#,##0.00;\"zero\"* [Blue]#,##0.00"), null, BorderDefinition.None, null);
             yield return RowForType(new DecimalCellElement(123456.7890123m, rur), "Russian roubles.");
             yield return RowForType(new DecimalCellElement(123456.7890123m / 68m, usd), "US dollars.");
             yield return RowForType(new DecimalCellElement(123456.7890123m, conditional), "Conditional colored.");
             yield return RowForType(new DecimalCellElement(0m, conditional), "Conditional colored.");
             yield return RowForType(new DecimalCellElement(-123456.7890123m, conditional), "Conditional colored.");
-            foreach (var dateTimeFormat in DateTimeFormat.GetDateTimeFormats())
-
+            
+            foreach (var format in IntegerFormat.GetIntegerFormats())
             {
-                var dateTime = new DateTime(2014, 12, 29, 16, 35, 56).AddMilliseconds(125);
-                yield return RowForType(new DateCellElement(dateTime, new DateStyleDefinition(dateTimeFormat.FormatCode, null, BorderDefinition.None, null)), dateTimeFormat.FormatCode);
+                var numberStyleDefinition = new NumberStyleDefinition(format, null, BorderDefinition.None, null);
+                foreach (var value in new long[] {-123456, -123, 0, 123, 123456})
+                {
+                    yield return RowForType(new IntegerCellElement(value, numberStyleDefinition), GetValueFormatComment(format, value.ToString(CultureInfo.InvariantCulture)));
+                    yield return RowForType(new IntegerCellElement(value), GetNoStyleComment(value.ToString(CultureInfo.InvariantCulture)));
+                }
             }
-            yield return new RowElement(new DateCellElement(DateTime.Now, new DateStyleDefinition("d-mmm-yy", null, BorderDefinition.None, null)));
+
+            foreach (var format in DecimalFormat.GetDecimalFormats())
+            {
+                var numberStyleDefinition = new NumberStyleDefinition(format, null, BorderDefinition.None, null);
+                foreach (var value in new[] {-123456.123456m, -123, -0.12345m, 0, 0.12345m, 123, 123456.123456m})
+                {
+                    yield return RowForType(new DecimalCellElement(value, numberStyleDefinition), GetValueFormatComment(format, value.ToString(CultureInfo.InvariantCulture)));
+                    yield return RowForType(new DecimalCellElement(value), GetNoStyleComment(value.ToString(CultureInfo.InvariantCulture)));
+                }
+            }
+            
+            foreach (var format in DateTimeFormat.GetDateTimeFormats())
+            {
+                var value = new DateTime(2014, 12, 29, 16, 35, 56).AddMilliseconds(125);
+                yield return RowForType(new DateTimeCellElement(value, new DateStyleDefinition(format, null, BorderDefinition.None, null)), GetValueFormatComment(format, value.ToString("u")));
+                yield return RowForType(new DateTimeCellElement(value), GetNoStyleComment(value.ToString("u")));
+            }
         }
 
-        private static RowElement RowForNumberStyle(decimal value, DecimalFormat commonValueFormat, string comment)
+        private static string GetNoStyleComment(string value)
         {
-            return RowForType(new DecimalCellElement(value, new NumberStyleDefinition(commonValueFormat.FormatCode, null, BorderDefinition.None, null)), comment);
+            return string.Format("No format specified. Value: {0}", value);
+        }
+
+        private static string GetValueFormatComment(CommonValueFormat numberFormat, string value)
+        {
+            return string.Format("Format: \"{0}\", value: {1}", numberFormat.FormatCode, value);
         }
 
         private static RowElement RowForType<T>(T element, string comment = "") where T : CellElement
         {
-            return new RowElement(new InlineStringElement(typeof(T).Name), new EmptyCellElement(), element, new EmptyCellElement(), new InlineStringElement(comment));
+            return new RowElement(new InlineStringElement(typeof(T).Name), EmptyCellElement.Instance, element, EmptyCellElement.Instance, new InlineStringElement(comment));
         }
 
         private static IEnumerable<RowElement> GetBorderStylingRows()
@@ -188,7 +205,7 @@ namespace JumboExcel
             var borderStylingRows = new List<RowElement> { new RowElement() };
             foreach (var bv in borderVariants)
             {
-                borderStylingRows.Add(new RowElement(new EmptyCellElement(),
+                borderStylingRows.Add(new RowElement(EmptyCellElement.Instance,
                     new InlineStringElement(bv.ToString(), new StringStyleDefinition(null, bv, null))));
                 AddEmptyRow(borderStylingRows);
             }
@@ -204,11 +221,6 @@ namespace JumboExcel
         {
             var fileName = WriteFile(worksheetElements);
             Process.Start(fileName);
-        }
-
-        private static string WriteFile(params WorksheetElement[] worksheetElements)
-        {
-            return WriteFileInternal(worksheetElements);
         }
 
         private static string WriteFile(IEnumerable<WorksheetElement> worksheetElements)

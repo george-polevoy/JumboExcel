@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace JumboExcel.Formatting
 {
-    public class IntegerFormat : CommonValueFormat
+    public class IntegerFormat : NumberFormat
     {
         internal IntegerFormat(int id, string formatCode) : base(id, formatCode)
         {
@@ -11,19 +11,36 @@ namespace JumboExcel.Formatting
         /// <summary>
         /// Predefined number format <c>0</c>.
         /// </summary>
-        public static readonly IntegerFormat GeneralValue = new IntegerFormat(1, "0");
+        public static readonly NumberFormat General = new IntegerFormat(1, "0");
+
+        /// <summary>
+        /// Predefined number format <c>#,##0 ;(#,##0)</c>.
+        /// </summary>
+        /// <remarks>Negative number is in round brackets. Positive number is aligned right and shifted one character left, to accomodate the closing bracket of negative numbers.</remarks>
+        public static readonly NumberFormat AccountingAmount = new IntegerFormat(37, "#,##0 ;(#,##0)");
+
+        /// <summary>
+        /// Predefined number format <c>#,##0 ;[Red](#,##0)</c>.
+        /// </summary>
+        /// <remarks>Negative number is in round brackets, colored red. Positive number is aligned right and shifted one character left, to accomodate the closing bracket of negative numbers.</remarks>
+        public static readonly NumberFormat AccountingAmountColored = new IntegerFormat(38, "#,##0 ;[Red](#,##0)");
 
         /// <summary>
         /// Predefined number format <c>#,##0</c>.
         /// </summary>
         public static readonly IntegerFormat IntegerWithSeparator = new IntegerFormat(3, "#,##0");
 
-        public static IEnumerable<IntegerFormat> GetIntegerFormsts()
+        /// <summary>
+        /// Get all integer formats.
+        /// </summary>
+        public static IEnumerable<NumberFormat> GetIntegerFormats()
         {
             return new[]
             {
-                GeneralValue,
-                IntegerWithSeparator
+                General,
+                IntegerWithSeparator,
+                AccountingAmount,
+                AccountingAmountColored
             };
         }
     }

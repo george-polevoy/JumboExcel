@@ -1,8 +1,7 @@
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Runtime.Remoting;
+using JumboExcel.Formatting;
 using JumboExcel.Styling;
 using NUnit.Framework;
 
@@ -38,10 +37,10 @@ namespace JumboExcel
                 from definitions in new CellStyleDefinition[]
                 {
                     new StringStyleDefinition(new FontDefinition(typeface, size, color, fontSlope, fontWeight), border, fillColor),
-                    new NumberStyleDefinition("1", new FontDefinition(typeface, size, color, fontSlope, fontWeight), border, fillColor),
-                    new NumberStyleDefinition("0", new FontDefinition(typeface, size, color, fontSlope, fontWeight), border, fillColor),
+                    new NumberStyleDefinition(NumberFormat.Default, new FontDefinition(typeface, size, color, fontSlope, fontWeight), border, fillColor),
+                    new NumberStyleDefinition(IntegerFormat.General, new FontDefinition(typeface, size, color, fontSlope, fontWeight), border, fillColor),
                     new NumberStyleDefinition(null, new FontDefinition(typeface, size, color, fontSlope, fontWeight), border, fillColor),
-                    new DateStyleDefinition("yyyy", new FontDefinition(typeface, size, color, fontSlope, fontWeight), border, fillColor),
+                    new DateStyleDefinition(new DateTimeFormat(-1, "yyyy"), new FontDefinition(typeface, size, color, fontSlope, fontWeight), border, fillColor),
                     new DateStyleDefinition(null, new FontDefinition(typeface, size, color, fontSlope, fontWeight), border, fillColor),
                 }
                 select definitions;

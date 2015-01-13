@@ -3,10 +3,18 @@ using JumboExcel.Styling;
 
 namespace JumboExcel.Structure
 {
-    public class IntegerCellElement : NumberCell<Int64>
+    /// <summary>
+    /// Represents nullable cell.
+    /// </summary>
+    public sealed class IntegerCellElement : NumberCell<Int64>
     {
-        public IntegerCellElement(Int64? value, NumberStyleDefinition style = null)
-            : base(value, style)
+        /// <summary>
+        /// Constructor, taking a nullable value and style definition.
+        /// </summary>
+        /// <param name="number">Value or null.</param>
+        /// <param name="style">Style.</param>
+        public IntegerCellElement(Int64? number, NumberStyleDefinition style = null)
+            : base(number, style)
         {
         }
 

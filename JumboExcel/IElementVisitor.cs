@@ -10,7 +10,7 @@ namespace JumboExcel
         void VisitEmptyCell();
         void Visit(IntegerCellElement integerCellElement);
         void Visit(DecimalCellElement decimalCellElement);
-        void Visit(DateCellElement dateCellElement);
+        void Visit(DateTimeCellElement dateTimeCellElement);
         void Visit(InlineStringElement inlineStringElement);
         void Visit(SharedStringElement sharedStringElement);
     }

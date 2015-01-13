@@ -12,24 +12,21 @@ namespace JumboExcel
 
         private readonly List<Cell> allocatedSampleCells = new List<Cell>();
         
-        public int Count { get { return allocatedSampleCells.Count; } }
-
         public SharedCellStyleCollection(SharedElementCollection<CellStyleDefinition> sharedElementCollection, int cellFormatIndexCorrelation)
         {
             cellStyleDefinitions = sharedElementCollection;
             this.cellFormatIndexCorrelation = cellFormatIndexCorrelation;
         }
 
-        public Cell AllocateCell(CellStyleDefinition cellStyleDefinition, CellValues cellValueType)
+        public Cell AllocateCell(CellStyleDefinition cellStyleDefinition, CellValues cellValueType, bool applyType = true)
         {
             var index = cellStyleDefinitions.AllocateElement(cellStyleDefinition);
             if (index < allocatedSampleCells.Count)
                 return allocatedSampleCells[index];
-            var cell = new Cell
-            {
-                DataType = new EnumValue<CellValues>(cellValueType),
-                StyleIndex = (uint) (allocatedSampleCells.Count + cellFormatIndexCorrelation)
-            };
+            var cell = new Cell();
+            cell.StyleIndex = (uint) (allocatedSampleCells.Count + cellFormatIndexCorrelation);
+            if (applyType)
+                cell.DataType = new EnumValue<CellValues>(cellValueType);
             allocatedSampleCells.Add(cell);
             return cell;
         }

@@ -21,7 +21,7 @@ namespace JumboExcel.Structure
 
         public NumberStyleDefinition Style { get; private set; }
 
-        protected NumberCell(TData? value, NumberStyleDefinition style) : base(value)
+        protected NumberCell(TData? number, NumberStyleDefinition style) : base(number)
         {
             Style = style;
         }

@@ -3,8 +3,12 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Drawing;
 using DocumentFormat.OpenXml.Spreadsheet;
+using JumboExcel.Formatting;
 using JumboExcel.Structure;
+using JumboExcel.Styling;
+using Text = DocumentFormat.OpenXml.Spreadsheet.Text;
 
 namespace JumboExcel
 {
@@ -20,15 +24,35 @@ namespace JumboExcel
 
         private readonly CellValue sharedSampleCellValue = new CellValue();
 
-        private readonly Cell sharedSampleNumberCell = new Cell { DataType = new EnumValue<CellValues>(CellValues.Number) };
+        private readonly Cell sharedSampleNumberCell = new Cell {DataType = new EnumValue<CellValues>(CellValues.Number)};
 
-        private readonly Cell sharedSampleSharedStringCell = new Cell { DataType = new EnumValue<CellValues>(CellValues.SharedString)};
-        
-        private readonly Cell sharedSampleInlineStringCell = new Cell { DataType = new EnumValue<CellValues>(CellValues.String) };
+        private Cell sharedSampleSharedStringCell;
 
-        private readonly List<Row> sampleRowOulineLevels = new List<Row> { new Row() };
+        private Cell sharedSampleInlineStringCell;
+
+        private readonly InlineString sharedSampleInlineString = new InlineString();
+
+        private readonly Text sharedSampleText = new Text();
+
+        private readonly List<Row> sampleRowOulineLevels = new List<Row> {new Row()};
 
         private int outlineLevel;
+        
+        Cell SharedSampleSharedStringCell
+        {
+            get
+            {
+                return sharedSampleSharedStringCell ?? (sharedSampleSharedStringCell = cellStyleDefinitions.AllocateCell(new SharedStringStyleDefinition(null, BorderDefinition.None, null), CellValues.SharedString));
+            }
+        }
+
+        Cell SharedSampleInlineStringCell
+        {
+            get
+            {
+                return sharedSampleInlineStringCell ?? (sharedSampleInlineStringCell = cellStyleDefinitions.AllocateCell(new StringStyleDefinition(null, BorderDefinition.None, null), CellValues.InlineString));
+            }
+        }
 
         public OpenXmlElementVisitor(OpenXmlWriter writer, SharedElementCollection<string> sharedStringCollection, SharedCellStyleCollection cellStyleDefinitions)
         {
@@ -134,31 +158,31 @@ namespace JumboExcel
             }
         }
 
-        public void Visit(DateCellElement dateCellElement)
+        public void Visit(DateTimeCellElement dateTimeCellElement)
         {
-            var sampleCell = dateCellElement.DateStyle == null ? sharedSampleNumberCell : cellStyleDefinitions.AllocateCell(dateCellElement.DateStyle, CellValues.Number);
+            var sampleCell = dateTimeCellElement.Style == null ? sharedSampleNumberCell : cellStyleDefinitions.AllocateCell(dateTimeCellElement.Style, CellValues.Number);
             using (new WriterScope(writer, sampleCell))
             using (new WriterScope(writer, sharedSampleCellValue))
             {
-                if (dateCellElement.Value.HasValue)
-                    writer.WriteString(dateCellElement.Value.Value.ToOADate().ToString(CultureInfo.InvariantCulture));
+                if (dateTimeCellElement.Value.HasValue)
+                    writer.WriteString(dateTimeCellElement.Value.Value.ToOADate().ToString(CultureInfo.InvariantCulture));
             }
         }
 
         public void Visit(InlineStringElement inlineStringElement)
         {
-            var sampleCell = inlineStringElement.Style == null ? sharedSampleInlineStringCell : cellStyleDefinitions.AllocateCell(inlineStringElement.Style, CellValues.String);
+            var sampleCell = inlineStringElement.Style == null ? SharedSampleInlineStringCell : cellStyleDefinitions.AllocateCell(inlineStringElement.Style, CellValues.InlineString);
             using (new WriterScope(writer, sampleCell))
-            using (new WriterScope(writer, sharedSampleCellValue))
+            using (new WriterScope(writer, sharedSampleInlineString))
+            using (new WriterScope(writer, sharedSampleText))
             {
-                if (inlineStringElement.Value != null)
-                    writer.WriteString(inlineStringElement.Value);
+                writer.WriteString(inlineStringElement.Value);
             }
         }
 
         public void Visit(SharedStringElement sharedStringElement)
         {
-            var sampleCell = sharedStringElement.Style == null ? sharedSampleSharedStringCell : cellStyleDefinitions.AllocateCell(sharedStringElement.Style, CellValues.SharedString);
+            var sampleCell = sharedStringElement.Style == null ? SharedSampleSharedStringCell : cellStyleDefinitions.AllocateCell(sharedStringElement.Style, CellValues.SharedString);
             using (new WriterScope(writer, sampleCell))
             using (new WriterScope(writer, sharedSampleCellValue))
             {

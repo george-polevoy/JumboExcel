@@ -3,9 +3,12 @@ using JumboExcel.Styling;
 
 namespace JumboExcel.Structure
 {
+    /// <summary>
+    /// Represents a cell, holding a decimal value.
+    /// </summary>
     public sealed class DecimalCellElement : NumberCell<decimal>
     {
-        public DecimalCellElement(Decimal? value, NumberStyleDefinition style = null) : base(value, style)
+        public DecimalCellElement(Decimal? number, NumberStyleDefinition style = null) : base(number, style)
         {
         }
 

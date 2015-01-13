@@ -2,6 +2,10 @@ using JumboExcel.Styling;
 
 namespace JumboExcel.Structure
 {
+    /// <summary>
+    /// Represents inline string.
+    /// </summary>
+    /// <remarks>http://stackoverflow.com/questions/6468783/what-is-the-difference-between-cellvalues-inlinestring-and-cellvalues-string-in</remarks>
     public class InlineStringElement : CellElement
     {
         public override string ToString()

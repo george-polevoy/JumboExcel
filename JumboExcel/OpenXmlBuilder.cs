@@ -134,7 +134,12 @@ namespace JumboExcel
             foreach (var style in sharedStylesCollection.GetAll())
             {
                 if (style.Format != null)
-                    customNumberFormats.AllocateElement(style.Format);
+                {
+                    CommonValueFormat commonValueFormat;
+                    if (!commonNumberFormats.TryGetValue(style.Format, out commonValueFormat))
+                        customNumberFormats.AllocateElement(style.Format);
+                }
+                    
                 if (style.FontDefinition != null)
                     fontDefinitions.AllocateElement(style.FontDefinition);
                 if (style.FillColor != null)

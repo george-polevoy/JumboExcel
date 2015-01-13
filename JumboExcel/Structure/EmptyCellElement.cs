@@ -1,19 +1,18 @@
-using JumboExcel.Styling;
-
 namespace JumboExcel.Structure
 {
-    public class EmptyCellElement : CellElement
+    public sealed class EmptyCellElement : CellElement
     {
-        public StringStyleDefinition StyleDefinition { get; set; }
+        private static readonly EmptyCellElement instance = new EmptyCellElement();
+
+        public static EmptyCellElement Instance { get { return instance; } }
+
+        private EmptyCellElement()
+        {
+        }
 
         public override void Accept(IElementVisitor visitor)
         {
             visitor.VisitEmptyCell();
-        }
-
-        public EmptyCellElement(StringStyleDefinition styleDefinition = null)
-        {
-            StyleDefinition = styleDefinition;
         }
     }
 }

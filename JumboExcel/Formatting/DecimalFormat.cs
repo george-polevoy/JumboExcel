@@ -2,9 +2,9 @@ using System.Collections.Generic;
 
 namespace JumboExcel.Formatting
 {
-    public class DecimalFormat : CommonValueFormat
+    public class DecimalFormat : NumberFormat
     {
-        internal DecimalFormat(int id, string formatCode) : base(id, formatCode)
+        private DecimalFormat(int id, string formatCode) : base(id, formatCode)
         {
         }
 
@@ -48,7 +48,21 @@ namespace JumboExcel.Formatting
         /// </summary>
         public static readonly DecimalFormat FractionWithDenominatorPrecise = new DecimalFormat(13, "# ??/??");
 
-        public static IEnumerable<DecimalFormat> GetDecimalFormats()
+        /// <summary>
+        /// Predefined number format <c>#,##0.00;(#,##0.00)</c>.
+        /// </summary>
+        /// <remarks></remarks>
+        public static readonly DecimalFormat AccountingAmount = new DecimalFormat(39, "#,##0.00;(#,##0.00)");
+
+        /// <summary>
+        /// Predefined number format <c>#,##0.00;[Red](#,##0.00)</c>.
+        /// </summary>
+        public static readonly DecimalFormat AccountingAmountColored = new DecimalFormat(40, "#,##0.00;[Red](#,##0.00)");
+
+        /// <summary>
+        /// Get all decimal formats.
+        /// </summary>
+        public static IEnumerable<NumberFormat> GetDecimalFormats()
         {
             return new[]
             {
@@ -57,7 +71,9 @@ namespace JumboExcel.Formatting
                 IntegerPercents,
                 PercentsTwoDecimalPlaces,
                 ValueWithExponent1,
-                ValueWithExponent2
+                ValueWithExponent2,
+                AccountingAmount,
+                AccountingAmountColored
             };
         }
     }
