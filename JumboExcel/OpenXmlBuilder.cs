@@ -37,8 +37,8 @@ namespace JumboExcel
 
         private readonly Fill[] defaultFills = { new Fill(new PatternFill { PatternType = PatternValues.None }), new Fill(new PatternFill { PatternType = PatternValues.Gray125 }) };
         private readonly NumberingFormat[] defaultNumberingFormats = { new NumberingFormat { NumberFormatId = 0, FormatCode = "", } };
-        private CellFormat[] defaultCellFormats = { new CellFormat { FontId = 0, FillId = 0, BorderId = 0, } };
-        private readonly Font[] defaultFonts = new[] { new Font(new FontSize { Val = 11 }, new Color { Rgb = new HexBinaryValue { Value = "000000" } }, new FontName { Val = "Calibri" }) };
+        private readonly CellFormat[] defaultCellFormats = { new CellFormat { FontId = 0, FillId = 0, BorderId = 0, } };
+        private readonly Font[] defaultFonts = { new Font(new FontSize { Val = 11 }, new Color { Rgb = new HexBinaryValue { Value = "000000" } }, new FontName { Val = "Calibri" }) };
 
         private int CellFormatIndexCorrelation()
         {

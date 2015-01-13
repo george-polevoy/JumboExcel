@@ -3,12 +3,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using DocumentFormat.OpenXml;
-using DocumentFormat.OpenXml.Drawing;
 using DocumentFormat.OpenXml.Spreadsheet;
-using JumboExcel.Formatting;
 using JumboExcel.Structure;
 using JumboExcel.Styling;
-using Text = DocumentFormat.OpenXml.Spreadsheet.Text;
 
 namespace JumboExcel
 {
