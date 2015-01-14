@@ -10,34 +10,79 @@ using JumboExcel.Styling;
 
 namespace JumboExcel
 {
+    /// <summary>
+    /// Generates worksheet contents according to provided <see cref="DocumentElement"/> elements.
+    /// </summary>
     class OpenXmlElementVisitor : IElementVisitor
     {
+        /// <summary>
+        /// Component for writing OpenXml document.
+        /// </summary>
         private readonly OpenXmlWriter writer;
 
+        /// <summary>
+        /// Collection of shared strings. Accumulates strings provided in <see cref="SharedStringElement"/> instances.
+        /// </summary>
         private readonly SharedElementCollection<string> sharedStringCollection;
 
+        /// <summary>
+        /// Collection of shared cell styles.
+        /// </summary>
         private readonly SharedCellStyleCollection cellStyleDefinitions;
 
+        /// <summary>
+        /// Reusable component instance.
+        /// </summary>
         private readonly Cell sharedSampleCell = new Cell();
 
+        /// <summary>
+        /// Reusable component instance.
+        /// </summary>
         private readonly CellValue sharedSampleCellValue = new CellValue();
 
+        /// <summary>
+        /// Reusable component instance.
+        /// </summary>
         private readonly Cell sharedSampleNumberCell = new Cell {DataType = new EnumValue<CellValues>(CellValues.Number)};
 
+        /// <summary>
+        /// Reusable component instance.
+        /// </summary>
         private Cell sharedSampleDateTimeCell;
 
+        /// <summary>
+        /// Reusable component instance.
+        /// </summary>
         private Cell sharedSampleSharedStringCell;
 
+        /// <summary>
+        /// Reusable component instance.
+        /// </summary>
         private Cell sharedSampleInlineStringCell;
 
+        /// <summary>
+        /// Reusable component instance.
+        /// </summary>
         private readonly InlineString sharedSampleInlineString = new InlineString();
 
+        /// <summary>
+        /// Reusable component instance.
+        /// </summary>
         private readonly Text sharedSampleText = new Text();
 
+        /// <summary>
+        /// Collection of reusable component instances for wrtiting nested <see cref="RowGroupElement"/> elements.
+        /// </summary>
         private readonly List<Row> sampleRowOulineLevels = new List<Row> {new Row()};
 
+        /// <summary>
+        /// Current outline level for row grouping for writing nested <see cref="RowGroupElement"/> elements.
+        /// </summary>
         private int outlineLevel;
-        
+
+        /// <summary>
+        /// Reusable component instance.
+        /// </summary>
         Cell SharedSampleSharedStringCell
         {
             get
@@ -46,6 +91,9 @@ namespace JumboExcel
             }
         }
 
+        /// <summary>
+        /// Reusable component instance.
+        /// </summary>
         Cell SharedSampleDateTimeCell
         {
             get
@@ -54,6 +102,9 @@ namespace JumboExcel
             }
         }
 
+        /// <summary>
+        /// Reusable component instance.
+        /// </summary>
         Cell SharedSampleInlineStringCell
         {
             get
@@ -62,6 +113,12 @@ namespace JumboExcel
             }
         }
 
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="writer">Writer for the worksheet part.</param>
+        /// <param name="sharedStringCollection">Shared string collection for the workbook (shared for the entire Excel document). Items accumulated during generation are later used in shared string part generation.</param>
+        /// <param name="cellStyleDefinitions">Shared cell style collection for the workbook (shared for the entire Excel document). Items accumulated in this collection are later used in stylesheet part generation.</param>
         public OpenXmlElementVisitor(OpenXmlWriter writer, SharedElementCollection<string> sharedStringCollection, SharedCellStyleCollection cellStyleDefinitions)
         {
             this.writer = writer;
@@ -195,7 +252,7 @@ namespace JumboExcel
             using (new WriterScope(writer, sharedSampleCellValue))
             {
                 if (sharedStringElement.Value != null)
-                    writer.WriteString(sharedStringCollection.AllocateElement(sharedStringElement.Value).ToString());
+                    writer.WriteString(sharedStringCollection.GetOrAllocateElement(sharedStringElement.Value).ToString());
             }
         }
     }

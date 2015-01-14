@@ -3,18 +3,44 @@ using System.Drawing;
 
 namespace JumboExcel.Styling
 {
+    /// <summary>
+    /// Represents font definition.
+    /// </summary>
     public sealed class FontDefinition : IEquatable<FontDefinition>
     {
+        /// <summary>
+        /// Typeface of the font.
+        /// </summary>
         public string Typeface { get; private set; }
 
+        /// <summary>
+        /// Size of the font in default OpenXml size units.
+        /// </summary>
         public decimal Size { get; private set; }
 
+        /// <summary>
+        /// Color of the text in a cell.
+        /// </summary>
         public Color Color { get; private set; }
 
+        /// <summary>
+        /// Font weight.
+        /// </summary>
         public FontWeight FontWeight { get; private set; }
 
+        /// <summary>
+        /// Font slope.
+        /// </summary>
         public FontSlope FontSlope { get; private set; }
 
+        /// <summary>
+        /// Constructs font definition.
+        /// </summary>
+        /// <param name="typeface">Typeface.</param>
+        /// <param name="size">Size.</param>
+        /// <param name="color">Color.</param>
+        /// <param name="fontSlope">Slope.</param>
+        /// <param name="fontWeight">Weight.</param>
         public FontDefinition(string typeface, decimal size, Color color, FontSlope fontSlope, FontWeight fontWeight)
         {
             if (size < 0.1m || size > 500m)

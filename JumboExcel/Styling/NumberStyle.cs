@@ -2,6 +2,9 @@ using System;
 
 namespace JumboExcel.Styling
 {
+    /// <summary>
+    /// Represents border presence for cell sides.
+    /// </summary>
     [Flags]
     public enum BorderDefinition
     {

@@ -2,6 +2,9 @@ using JumboExcel.Structure;
 
 namespace JumboExcel
 {
+    /// <summary>
+    /// Visitor interface for hierarchical structure of <see cref="DocumentElement"/>.
+    /// </summary>
     public interface IElementVisitor
     {
         void Visit(WorksheetElement worksheetElement);

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Spreadsheet;
@@ -99,7 +98,7 @@ namespace JumboExcel
 
         private CellStyleOption AllocateCellOption(CellStyleDefinition cellStyleDefinition)
         {
-            var index = cellStyleDefinitions.AllocateElement(cellStyleDefinition);
+            var index = cellStyleDefinitions.GetOrAllocateElement(cellStyleDefinition);
             if (index < allocatedSampleCells.Count)
                 return allocatedSampleCells[index];
             var cellStyleOption = new CellStyleOption((allocatedSampleCells.Count + cellFormatIndexCorrelation));

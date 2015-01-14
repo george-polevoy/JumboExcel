@@ -10,9 +10,9 @@ namespace JumboExcel
         public void CollectionAllocatesIndexes()
         {
             var collection = new SharedElementCollection<string>();
-            Assert.AreEqual(0, collection.AllocateElement("Foo"));
-            Assert.AreEqual(1, collection.AllocateElement("Bar"));
-            Assert.AreEqual(0, collection.AllocateElement("Foo"));
+            Assert.AreEqual(0, collection.GetOrAllocateElement("Foo"));
+            Assert.AreEqual(1, collection.GetOrAllocateElement("Bar"));
+            Assert.AreEqual(0, collection.GetOrAllocateElement("Foo"));
         }
 
         [Test]
@@ -24,7 +24,7 @@ namespace JumboExcel
             var expected = source.Split(new[] { ",", " " }, StringSplitOptions.RemoveEmptyEntries);
             var collection = new SharedElementCollection<string>();
             foreach (var s in expected)
-                collection.AllocateElement(s);
+                collection.GetOrAllocateElement(s);
             Assert.AreEqual(expected.Length, collection.Count);
         }
 
@@ -38,7 +38,7 @@ namespace JumboExcel
             var expected = source.Split(new[] {",", " "}, StringSplitOptions.RemoveEmptyEntries);
             var collection = new SharedElementCollection<string>();
             foreach (var s in expected)
-                collection.AllocateElement(s);
+                collection.GetOrAllocateElement(s);
 
             var originalIenumerable = collection.DequeueAll();
             // ReSharper disable once PossibleMultipleEnumeration
