@@ -3,7 +3,8 @@ using JumboExcel.Styling;
 namespace JumboExcel.Structure
 {
     /// <summary>
-    /// Represents shared string.
+    /// Represents shared string. Use this class to represent lengthy strings, that a likely to appear more then once in the document. For string values that a likely to be unique, use <see cref="InlineStringElement"/>
+    /// This representation uses internal shared string string table structure, which saves memory in case of repeated strings.
     /// </summary>
     /// <remarks>http://stackoverflow.com/questions/6468783/what-is-the-difference-between-cellvalues-inlinestring-and-cellvalues-string-in</remarks>
     public class SharedStringElement : CellElement

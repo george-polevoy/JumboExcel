@@ -2,9 +2,12 @@ using System.Collections.Generic;
 
 namespace JumboExcel.Formatting
 {
+    /// <summary>
+    /// Represents integer number format.
+    /// </summary>
     public class IntegerFormat : NumberFormat
     {
-        internal IntegerFormat(int id, string formatCode) : base(id, formatCode)
+        private IntegerFormat(int id, string formatCode) : base(id, formatCode)
         {
         }
 

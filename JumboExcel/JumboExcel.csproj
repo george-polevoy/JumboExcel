@@ -52,12 +52,15 @@
     <Compile Include="Formatting\NumberFormat.cs" />
     <Compile Include="SharedCellStyleCollection.cs" />
     <Compile Include="Structure\CellElement.cs" />
+    <Compile Include="Structure\ColumnElement.cs" />
     <Compile Include="Structure\DateTimeCellElement.cs" />
     <Compile Include="Structure\DecimalCellElement.cs" />
     <Compile Include="Structure\EmptyCellElement.cs" />
     <Compile Include="Structure\InlineStringElement.cs" />
     <Compile Include="Structure\IntegerCellElement.cs" />
     <Compile Include="Structure\RowElement.cs" />
+    <Compile Include="Structure\RowGroupElement.cs" />
+    <Compile Include="Structure\RowLevelElement.cs" />
     <Compile Include="Structure\SharedStringElement.cs" />
     <Compile Include="Structure\ValueCell.cs" />
     <Compile Include="Structure\WorksheetElement.cs" />

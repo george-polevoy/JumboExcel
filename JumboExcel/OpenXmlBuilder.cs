@@ -17,7 +17,10 @@ namespace JumboExcel
     /// </summary>
     public class OpenXmlBuilder
     {
-        private const int BaseCustomFormatId = 165;
+        /// <summary>
+        /// Specifies the lowest safe value to use as a custom number format, not to interfere with built-in number formats.
+        /// </summary>
+        private readonly static int BaseCustomFormatId = 165;
 
         /// <summary>
         /// Default border definitions.

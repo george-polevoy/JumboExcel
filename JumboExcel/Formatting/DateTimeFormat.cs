@@ -2,13 +2,16 @@ using System.Collections.Generic;
 
 namespace JumboExcel.Formatting
 {
+    /// <summary>
+    /// Represents DateTime format.
+    /// </summary>
     public class DateTimeFormat : CommonValueFormat
     {
         public DateTimeFormat(string format) : base(-1, format)
         {
         }
 
-        internal DateTimeFormat(int id, string formatCode) : base(id, formatCode)
+        private DateTimeFormat(int id, string formatCode) : base(id, formatCode)
         {
         }
 

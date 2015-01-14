@@ -1,5 +1,8 @@
 namespace JumboExcel.Structure
 {
+    /// <summary>
+    /// Represents empty cell.
+    /// </summary>
     public sealed class EmptyCellElement : CellElement
     {
         private static readonly EmptyCellElement instance = new EmptyCellElement();

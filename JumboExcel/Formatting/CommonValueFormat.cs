@@ -5,13 +5,26 @@ namespace JumboExcel.Formatting
 {
     public class CommonValueFormat : IEquatable<CommonValueFormat>
     {
+        /// <summary>
+        /// Identifier of number format. Represents custom number format, if equal to -1, and a build-in Excel number format if >=0
+        /// </summary>
         private readonly int id;
+        
+        /// <summary>
+        /// Excel number format code.
+        /// </summary>
         private readonly string formatCode;
 
+        /// <summary>
+        /// Identifier of number format. Represents custom number format, if equal to -1, and a build-in Excel number format if >=0
+        /// </summary>
         internal int Id { get { return id; } }
 
-        internal string FormatCode { get { return formatCode; } }
-
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="id">Id.</param>
+        /// <param name="formatCode">Format code.</param>
         internal CommonValueFormat(int id, string formatCode)
         {
             this.id = id;
@@ -19,10 +32,18 @@ namespace JumboExcel.Formatting
         }
 
         /// <summary>
-        /// Predefined number format <c>@</c>.
+        /// Excel number format code.
+        /// </summary>
+        internal string FormatCode { get { return formatCode; } }
+
+        /// <summary>
+        /// Predefined number format <c>@</c>. Displays value 'as is'.
         /// </summary>
         internal static readonly CommonValueFormat String = new CommonValueFormat(49, "@");
 
+        /// <summary>
+        /// Returns all number formats.
+        /// </summary>
         internal static IEnumerable<CommonValueFormat> GetFormats()
         {
             return new[] {

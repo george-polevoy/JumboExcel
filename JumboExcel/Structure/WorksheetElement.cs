@@ -1,20 +1,40 @@
-using System;
 using System.Collections.Generic;
 
 namespace JumboExcel.Structure
 {
+    /// <summary>
+    /// Represents worksheet parameters.
+    /// </summary>
     public class WorksheetParametersElement
     {
+        /// <summary>
+        /// Column configurations.
+        /// </summary>
         public IEnumerable<ColumnElement> ColumnElements { get; private set; }
 
+        /// <summary>
+        /// Specifies, if the summary rows are belo the grouped rows.
+        /// </summary>
         public bool Belo { get; private set; }
 
+        /// <summary>
+        /// Specifies, if the summary columns are at the right of grouped columns (Grouped collumns are not supported in this implementation).
+        /// </summary>
         public bool Right { get; private set; }
 
+        /// <summary>
+        /// Default constructor.
+        /// </summary>
         public WorksheetParametersElement()
         {
         }
 
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="belo">Specifies if the summary rows are belo the grouped rows.</param>
+        /// <param name="right">Specifies, if the summary columns are at the right of grouped columns (Grouped collumns are not supported in this implementation).</param>
+        /// <param name="columnElements">Column configurations.</param>
         public WorksheetParametersElement(bool belo, bool right, IEnumerable<ColumnElement> columnElements = null)
         {
             Belo = belo;
@@ -22,35 +42,18 @@ namespace JumboExcel.Structure
             ColumnElements = columnElements;
         }
 
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="belo">Specifies if the summary rows are belo the grouped rows.</param>
+        /// <param name="right">Specifies, if the summary columns are at the right of grouped columns (Grouped collumns are not supported in this implementation).</param>
+        /// <param name="columnElements">Column configurations.</param>
         public WorksheetParametersElement(bool belo, bool right, params ColumnElement[] columnElements)
         {
             Belo = belo;
             Right = right;
             ColumnElements = columnElements;
         }
-    }
-
-    public class ColumnElement
-    {
-        public ColumnElement(int min, int max, decimal width)
-        {
-            if (min < 0)
-                throw new ArgumentOutOfRangeException("min", min, "Must be > 0.");
-
-            if (max < min)
-                throw new ArgumentOutOfRangeException("max", max, "Must be > min.");
-
-            if (width < 0)
-                throw new ArgumentOutOfRangeException("width", width, "Must be > 0.");
-
-            Min = min;
-            Max = max;
-            Width = width;
-        }
-
-        public int Min { get; private set; }
-        public int Max { get; private set; }
-        public decimal Width { get; set; }
     }
 
     public class WorksheetElement : DocumentElement

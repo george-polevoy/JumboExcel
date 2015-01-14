@@ -4,10 +4,6 @@ namespace JumboExcel.Formatting
 {
     public class DecimalFormat : NumberFormat
     {
-        private DecimalFormat(int id, string formatCode) : base(id, formatCode)
-        {
-        }
-
         /// <summary>
         /// Predefined number format <c>0.00</c>.
         /// </summary>
@@ -58,6 +54,15 @@ namespace JumboExcel.Formatting
         /// Predefined number format <c>#,##0.00;[Red](#,##0.00)</c>.
         /// </summary>
         public static readonly DecimalFormat AccountingAmountColored = new DecimalFormat(40, "#,##0.00;[Red](#,##0.00)");
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="id">Identifier of the format. -1 corresponds to custom number formats, >0 corresponds to existing excel number format identifiers.</param>
+        /// <param name="formatCode"></param>
+        private DecimalFormat(int id, string formatCode) : base(id, formatCode)
+        {
+        }
 
         /// <summary>
         /// Get all decimal formats.
