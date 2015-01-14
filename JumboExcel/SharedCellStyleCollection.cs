@@ -86,7 +86,7 @@ namespace JumboExcel
             return cell;
         }
 
-        public Cell AllocateSharedStringCell(SharedStringStyleDefinition cellStyleDefinition, CellValues cellValueType)
+        public Cell AllocateSharedStringCell(StringStyleDefinition cellStyleDefinition, CellValues cellValueType)
         {
             var option = AllocateCellOption(cellStyleDefinition.CellStyleDefinition);
             if (option.SharedStringCell != null) return option.SharedStringCell;

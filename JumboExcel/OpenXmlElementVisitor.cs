@@ -92,7 +92,7 @@ namespace JumboExcel
         {
             get
             {
-                return sharedSampleSharedStringCell ?? (sharedSampleSharedStringCell = cellStyleDefinitions.AllocateSharedStringCell(new SharedStringStyleDefinition(null, BorderDefinition.None, null), CellValues.SharedString));
+                return sharedSampleSharedStringCell ?? (sharedSampleSharedStringCell = cellStyleDefinitions.AllocateSharedStringCell(new StringStyleDefinition(null, BorderDefinition.None, null), CellValues.SharedString));
             }
         }
 

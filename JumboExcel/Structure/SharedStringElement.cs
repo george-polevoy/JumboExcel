@@ -14,7 +14,7 @@ namespace JumboExcel.Structure
         /// </summary>
         private readonly string value;
 
-        public SharedStringElement(string value, SharedStringStyleDefinition style = default(SharedStringStyleDefinition))
+        public SharedStringElement(string value, StringStyleDefinition style = default(StringStyleDefinition))
         {
             this.value = value;
             Style = style;
@@ -25,7 +25,7 @@ namespace JumboExcel.Structure
         /// <summary>
         /// Style.
         /// </summary>
-        public SharedStringStyleDefinition Style { get; private set; }
+        public StringStyleDefinition Style { get; private set; }
 
         public override void Accept(IElementVisitor visitor)
         {

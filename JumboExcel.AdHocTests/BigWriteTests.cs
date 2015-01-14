@@ -87,7 +87,7 @@ namespace JumboExcel
 
         private IEnumerable<RowElement> GetRowsForNullValues()
         {
-            var headerStyle = new SharedStringStyleDefinition(new FontDefinition("Arial", 16, Color.White, FontSlope.Normal, FontWeight.Bold), BorderDefinition.All, Color.Teal);
+            var headerStyle = new StringStyleDefinition(new FontDefinition("Arial", 16, Color.White, FontSlope.Normal, FontWeight.Bold), BorderDefinition.All, Color.Teal);
             yield return new RowElement(new SharedStringElement("Value Type", headerStyle), new SharedStringElement("Missing Value", headerStyle));
 
             yield return MissingValueRow(new DecimalCellElement(null));
@@ -118,7 +118,7 @@ namespace JumboExcel
         private RowElement RowForColor(Color foregroundColor, Color? backgroundColor, string comment = "")
         {
             var fontDefinition = new FontDefinition(null, 11, foregroundColor, FontSlope.Normal, FontWeight.Normal);
-            var style = new SharedStringStyleDefinition(fontDefinition, BorderDefinition.None, backgroundColor);
+            var style = new StringStyleDefinition(fontDefinition, BorderDefinition.None, backgroundColor);
             return new RowElement(
                 new InlineStringElement(string.Format("{0} over {1}", foregroundColor.ToString(), backgroundColor == null ? "default" : backgroundColor.ToString())),
                 new SharedStringElement("Quick brown fox jumps over the lazy dog. 12345676890", style), new InlineStringElement(comment));
@@ -127,7 +127,7 @@ namespace JumboExcel
         private RowElement RowForFont(string fontFace, FontSlope slope, FontWeight weight, int size, string comment = "")
         {
             var fontDefinition = new FontDefinition(fontFace, size, Color.Black, slope, weight);
-            var style = new SharedStringStyleDefinition(fontDefinition, BorderDefinition.None, null);
+            var style = new StringStyleDefinition(fontDefinition, BorderDefinition.None, null);
             return new RowElement(
                 new InlineStringElement(fontDefinition.ToString()), new SharedStringElement("Quick brown fox jumps over the lazy dog. 12345676890", style), new InlineStringElement(comment));
         }

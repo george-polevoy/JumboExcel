@@ -1,69 +1,40 @@
 using System;
 using System.Drawing;
-using JumboExcel.Formatting;
 
 namespace JumboExcel.Styling
 {
-    public struct BooleanStyleDefinition
-    {
-        internal readonly CellStyleDefinition CellStyleDefinition;
-
-        public BooleanStyleDefinition(FontDefinition fontDefinition, BorderDefinition borderDefinition, Color? fillColor = default(Color?))
-        {
-            CellStyleDefinition = new CellStyleDefinition(fontDefinition, borderDefinition, fillColor);
-        }
-    }
-
-    public struct NumberStyleDefinition
-    {
-        internal readonly CellStyleDefinition CellStyleDefinition;
-
-        public NumberStyleDefinition(NumberFormat format, FontDefinition fontDefinition, BorderDefinition borderDefinition, Color? fillColor = default (Color?))
-        {
-            CellStyleDefinition = new CellStyleDefinition(fontDefinition, borderDefinition, fillColor, (format ?? NumberFormat.Default).FormatCode);
-        }
-    }
-
-    public struct DateStyleDefinition
-    {
-        internal readonly CellStyleDefinition CellStyleDefinition;
-
-        public DateStyleDefinition(DateTimeFormat format, FontDefinition fontDefinition, BorderDefinition borderDefinition, Color? fillColor = default (Color?))
-        {
-            CellStyleDefinition = new CellStyleDefinition(fontDefinition, borderDefinition, fillColor, (format ?? DateTimeFormat.DateDMmm).FormatCode);
-        }
-    }
-
-    public struct StringStyleDefinition
-    {
-        internal readonly CellStyleDefinition CellStyleDefinition;
-
-        public StringStyleDefinition(FontDefinition fontDefinition, BorderDefinition borderDefinition, Color? fillColor = default (Color?))
-        {
-            CellStyleDefinition =  new CellStyleDefinition(fontDefinition, borderDefinition, fillColor, CommonValueFormat.String.FormatCode);
-        }
-    }
-
-    public struct SharedStringStyleDefinition
-    {
-        internal readonly CellStyleDefinition CellStyleDefinition;
-
-        public SharedStringStyleDefinition(FontDefinition fontDefinition, BorderDefinition borderDefinition, Color? fillColor = default (Color?))
-        {
-            CellStyleDefinition = new CellStyleDefinition(fontDefinition, borderDefinition, fillColor, CommonValueFormat.String.FormatCode);
-        }
-    }
-
+    /// <summary>
+    /// Represents style definition.
+    /// </summary>
     class CellStyleDefinition : IEquatable<CellStyleDefinition>
     {
+        /// <summary>
+        /// Font.
+        /// </summary>
         public FontDefinition FontDefinition { get; private set; }
 
+        /// <summary>
+        /// Borders.
+        /// </summary>
         public BorderDefinition BorderDefinition { get; private set; }
 
+        /// <summary>
+        /// Fill color.
+        /// </summary>
         public Color? FillColor { get; private set; }
 
+        /// <summary>
+        /// Format.
+        /// </summary>
         internal string Format { get; private set; }
 
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="fontDefinition">Font.</param>
+        /// <param name="borderDefinition">Borders.</param>
+        /// <param name="fillColor">Fill color.</param>
+        /// <param name="format">Format.</param>
         internal CellStyleDefinition(FontDefinition fontDefinition, BorderDefinition borderDefinition, Color? fillColor, string format = null)
         {
             FontDefinition = fontDefinition;

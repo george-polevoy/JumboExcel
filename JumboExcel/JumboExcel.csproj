@@ -65,7 +65,9 @@
     <Compile Include="Structure\SharedStringElement.cs" />
     <Compile Include="Structure\ValueCell.cs" />
     <Compile Include="Structure\WorksheetElement.cs" />
+    <Compile Include="Styling\BooleanStyleDefinition.cs" />
     <Compile Include="Styling\CellStyleDefinition.cs" />
+    <Compile Include="Styling\DateStyleDefinition.cs" />
     <Compile Include="Styling\FontDefinition.cs" />
     <Compile Include="Styling\FontSlope.cs" />
     <Compile Include="Styling\FontWeight.cs" />
@@ -76,6 +78,8 @@
     <Compile Include="OpenXmlElementVisitor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SharedStringCollection.cs" />
+    <Compile Include="Styling\NumberStyleDefinition.cs" />
+    <Compile Include="Styling\StringStyleDefinition.cs" />
     <Compile Include="WriterScope.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
