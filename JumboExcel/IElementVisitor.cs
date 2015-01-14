@@ -16,5 +16,6 @@ namespace JumboExcel
         void Visit(DateTimeCellElement dateTimeCellElement);
         void Visit(InlineStringElement inlineStringElement);
         void Visit(SharedStringElement sharedStringElement);
+        void Visit(BooleanCellElement booleanCellElement);
     }
 }

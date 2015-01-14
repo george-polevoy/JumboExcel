@@ -5,7 +5,7 @@ namespace JumboExcel.Formatting
     /// <summary>
     /// Represents integer number format.
     /// </summary>
-    public class IntegerFormat : NumberFormat
+    public sealed class IntegerFormat : NumberFormat
     {
         private IntegerFormat(int id, string formatCode) : base(id, formatCode)
         {

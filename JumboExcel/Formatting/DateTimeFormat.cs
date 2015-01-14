@@ -5,7 +5,7 @@ namespace JumboExcel.Formatting
     /// <summary>
     /// Represents DateTime format.
     /// </summary>
-    public class DateTimeFormat : CommonValueFormat
+    public sealed class DateTimeFormat : CommonValueFormat
     {
         public DateTimeFormat(string format) : base(-1, format)
         {

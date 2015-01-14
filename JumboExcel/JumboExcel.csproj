@@ -51,6 +51,7 @@
     <Compile Include="Formatting\IntegerFormat.cs" />
     <Compile Include="Formatting\NumberFormat.cs" />
     <Compile Include="SharedCellStyleCollection.cs" />
+    <Compile Include="Structure\BooleanCellElement.cs" />
     <Compile Include="Structure\CellElement.cs" />
     <Compile Include="Structure\ColumnElement.cs" />
     <Compile Include="Structure\DateTimeCellElement.cs" />

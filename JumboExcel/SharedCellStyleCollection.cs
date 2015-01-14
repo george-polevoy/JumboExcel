@@ -35,7 +35,15 @@ namespace JumboExcel
         /// </summary>
         public Cell StringCell { get; set; }
 
+        /// <summary>
+        /// Cached cell instance for represented style, for <see cref="SharedStringStyleDefinition"/>
+        /// </summary>
         public Cell SharedStringCell { get; set; }
+
+        /// <summary>
+        /// Cached cell instance for represented style, for <see cref="BooleanStyleDefinition"/>
+        /// </summary>
+        public Cell BooleanCell { get; set; }
     }
 
     class SharedCellStyleCollection
@@ -104,6 +112,15 @@ namespace JumboExcel
             var cellStyleOption = new CellStyleOption((allocatedSampleCells.Count + cellFormatIndexCorrelation));
             allocatedSampleCells.Add(cellStyleOption);
             return cellStyleOption;
+        }
+
+        public Cell AllocateBooleanCell(BooleanStyleDefinition cellStyleDefinition, CellValues cellValueType)
+        {
+            var option = AllocateCellOption(cellStyleDefinition.CellStyleDefinition);
+            if (option.SharedStringCell != null) return option.BooleanCell;
+            var cell = CreateCell(cellValueType, option.Index);
+            option.BooleanCell = cell;
+            return cell;
         }
     }
 }

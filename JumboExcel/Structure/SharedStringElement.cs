@@ -9,16 +9,10 @@ namespace JumboExcel.Structure
     /// <remarks>http://stackoverflow.com/questions/6468783/what-is-the-difference-between-cellvalues-inlinestring-and-cellvalues-string-in</remarks>
     public class SharedStringElement : CellElement
     {
-        public override string ToString()
-        {
-            return string.Format("Value: {0}, Style: {1}", value, Style);
-        }
-
+        /// <summary>
+        /// Value.
+        /// </summary>
         private readonly string value;
-        
-        public SharedStringStyleDefinition Style { get; private set; }
-        
-        public string Value { get { return value; } }
 
         public SharedStringElement(string value, SharedStringStyleDefinition style = default(SharedStringStyleDefinition))
         {
@@ -26,9 +20,21 @@ namespace JumboExcel.Structure
             Style = style;
         }
 
+        public string Value { get { return value; } }
+
+        /// <summary>
+        /// Style.
+        /// </summary>
+        public SharedStringStyleDefinition Style { get; private set; }
+
         public override void Accept(IElementVisitor visitor)
         {
             visitor.Visit(this);
+        }
+
+        public override string ToString()
+        {
+            return string.Format("Value: {0}, Style: {1}", value, Style);
         }
     }
 }

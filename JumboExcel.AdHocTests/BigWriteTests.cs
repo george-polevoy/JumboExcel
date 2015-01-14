@@ -180,6 +180,13 @@ namespace JumboExcel
             {
                 yield return RowForType(new DateTimeCellElement(dateValue, new DateStyleDefinition(format, null, BorderDefinition.None, null)), GetValueFormatComment(format, dateValue.ToString("u")));
             }
+
+            yield return RowForType(new BooleanCellElement(null), "Null boolean without style.");
+            yield return RowForType(new BooleanCellElement(true), "True boolean without style.");
+            yield return RowForType(new BooleanCellElement(false), "False boolean without style.");
+            yield return RowForType(new BooleanCellElement(null, new BooleanStyleDefinition(null, BorderDefinition.None, Color.SkyBlue)), "Null boolean styled.");
+            yield return RowForType(new BooleanCellElement(true, new BooleanStyleDefinition(null, BorderDefinition.None, Color.SkyBlue)), "True boolean styled.");
+            yield return RowForType(new BooleanCellElement(false, new BooleanStyleDefinition(null, BorderDefinition.None, Color.SkyBlue)), "False boolean styled.");
         }
 
         private static string GetNoStyleComment(string value)

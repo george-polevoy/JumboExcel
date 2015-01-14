@@ -48,6 +48,11 @@ namespace JumboExcel
         /// <summary>
         /// Reusable component instance.
         /// </summary>
+        private readonly Cell sharedSampleBooleanCell = new Cell { DataType = new EnumValue<CellValues>(CellValues.Boolean) };
+
+        /// <summary>
+        /// Reusable component instance.
+        /// </summary>
         private Cell sharedSampleDateTimeCell;
 
         /// <summary>
@@ -253,6 +258,17 @@ namespace JumboExcel
             {
                 if (sharedStringElement.Value != null)
                     writer.WriteString(sharedStringCollection.GetOrAllocateElement(sharedStringElement.Value).ToString());
+            }
+        }
+
+        public void Visit(BooleanCellElement booleanCellElement)
+        {
+            var sampleCell = booleanCellElement.Style.CellStyleDefinition == null ? sharedSampleBooleanCell : cellStyleDefinitions.AllocateBooleanCell(booleanCellElement.Style, CellValues.Boolean);
+            using (new WriterScope(writer, sampleCell))
+            using (new WriterScope(writer, sharedSampleCellValue))
+            {
+                if (booleanCellElement.Value.HasValue)
+                    writer.WriteString(booleanCellElement.Value.Value ? "1" : "0");
             }
         }
     }

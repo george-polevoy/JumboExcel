@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace JumboExcel.Formatting
 {
-    public class DecimalFormat : NumberFormat
+    public sealed class DecimalFormat : NumberFormat
     {
         /// <summary>
         /// Predefined number format <c>0.00</c>.

@@ -4,6 +4,16 @@ using JumboExcel.Formatting;
 
 namespace JumboExcel.Styling
 {
+    public struct BooleanStyleDefinition
+    {
+        internal readonly CellStyleDefinition CellStyleDefinition;
+
+        public BooleanStyleDefinition(FontDefinition fontDefinition, BorderDefinition borderDefinition, Color? fillColor = default(Color?))
+        {
+            CellStyleDefinition = new CellStyleDefinition(fontDefinition, borderDefinition, fillColor);
+        }
+    }
+
     public struct NumberStyleDefinition
     {
         internal readonly CellStyleDefinition CellStyleDefinition;
