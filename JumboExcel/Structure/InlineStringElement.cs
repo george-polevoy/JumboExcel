@@ -17,7 +17,7 @@ namespace JumboExcel.Structure
         public StringStyleDefinition Style { get; set; }
         public string Value { get { return value; } }
 
-        public InlineStringElement(string value, StringStyleDefinition style = null)
+        public InlineStringElement(string value, StringStyleDefinition style = default(StringStyleDefinition))
         {
             this.value = value;
             Style = style;

@@ -9,7 +9,7 @@ namespace JumboExcel.Formatting
         }
 
         /// <summary>
-        /// Predefined number format <c>0</c>.
+        /// Predefined number format <c>0</c>. Renders integer number part.
         /// </summary>
         public static readonly NumberFormat General = new IntegerFormat(1, "0");
 

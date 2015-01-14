@@ -21,7 +21,7 @@ namespace JumboExcel.Formatting
         /// <summary>
         /// Predefined number format <c>@</c>.
         /// </summary>
-        public static readonly CommonValueFormat String = new CommonValueFormat(49, "@");
+        internal static readonly CommonValueFormat String = new CommonValueFormat(49, "@");
 
         internal static IEnumerable<CommonValueFormat> GetFormats()
         {

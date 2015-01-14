@@ -4,36 +4,47 @@ using JumboExcel.Formatting;
 
 namespace JumboExcel.Styling
 {
-    public sealed class NumberStyleDefinition : CellStyleDefinition
+    public struct NumberStyleDefinition
     {
-        public NumberStyleDefinition(NumberFormat format, FontDefinition fontDefinition, BorderDefinition borderDefinition, Color? fillColor) : base(fontDefinition, borderDefinition, fillColor, format.FormatCode)
+        internal readonly CellStyleDefinition CellStyleDefinition;
+
+        public NumberStyleDefinition(NumberFormat format, FontDefinition fontDefinition, BorderDefinition borderDefinition, Color? fillColor = default (Color?))
         {
+            CellStyleDefinition = new CellStyleDefinition(fontDefinition, borderDefinition, fillColor, (format ?? NumberFormat.Default).FormatCode);
         }
     }
 
-    public sealed class DateStyleDefinition : CellStyleDefinition
+    public struct DateStyleDefinition
     {
-        public DateStyleDefinition(DateTimeFormat format, FontDefinition fontDefinition, BorderDefinition borderDefinition, Color? fillColor) : base(fontDefinition, borderDefinition, fillColor, format.FormatCode)
+        internal readonly CellStyleDefinition CellStyleDefinition;
+
+        public DateStyleDefinition(DateTimeFormat format, FontDefinition fontDefinition, BorderDefinition borderDefinition, Color? fillColor = default (Color?))
         {
+            CellStyleDefinition = new CellStyleDefinition(fontDefinition, borderDefinition, fillColor, (format ?? DateTimeFormat.DateDMmm).FormatCode);
         }
     }
 
-    public sealed class StringStyleDefinition : CellStyleDefinition
+    public struct StringStyleDefinition
     {
-        public StringStyleDefinition(FontDefinition fontDefinition, BorderDefinition borderDefinition, Color? fillColor) : base(fontDefinition, borderDefinition, fillColor, CommonValueFormat.String.FormatCode)
+        internal readonly CellStyleDefinition CellStyleDefinition;
+
+        public StringStyleDefinition(FontDefinition fontDefinition, BorderDefinition borderDefinition, Color? fillColor = default (Color?))
         {
+            CellStyleDefinition =  new CellStyleDefinition(fontDefinition, borderDefinition, fillColor, CommonValueFormat.String.FormatCode);
         }
     }
 
-    public sealed class SharedStringStyleDefinition : CellStyleDefinition
+    public struct SharedStringStyleDefinition
     {
-        public SharedStringStyleDefinition(FontDefinition fontDefinition, BorderDefinition borderDefinition, Color? fillColor)
-            : base(fontDefinition, borderDefinition, fillColor, CommonValueFormat.String.FormatCode)
+        internal readonly CellStyleDefinition CellStyleDefinition;
+
+        public SharedStringStyleDefinition(FontDefinition fontDefinition, BorderDefinition borderDefinition, Color? fillColor = default (Color?))
         {
+            CellStyleDefinition = new CellStyleDefinition(fontDefinition, borderDefinition, fillColor, CommonValueFormat.String.FormatCode);
         }
     }
 
-    public abstract class CellStyleDefinition : IEquatable<CellStyleDefinition>
+    class CellStyleDefinition : IEquatable<CellStyleDefinition>
     {
         public FontDefinition FontDefinition { get; private set; }
 
@@ -55,7 +66,7 @@ namespace JumboExcel.Styling
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return other.GetType() == GetType() && string.Equals(Format, other.Format) && Equals(FontDefinition, other.FontDefinition) && BorderDefinition == other.BorderDefinition && FillColor.Equals(other.FillColor);
+            return string.Equals(Format, other.Format) && Equals(FontDefinition, other.FontDefinition) && BorderDefinition == other.BorderDefinition && FillColor.Equals(other.FillColor);
         }
 
         public override bool Equals(object obj)
@@ -80,7 +91,7 @@ namespace JumboExcel.Styling
 
         public override string ToString()
         {
-            return string.Format("{0}, {1}, {2}, {3}, {4}", GetType().Name, FontDefinition, BorderDefinition, FillColor, Format);
+            return string.Format("{0}, {1}, {2}, {3}", FontDefinition, BorderDefinition, FillColor, Format);
         }
     }
 }

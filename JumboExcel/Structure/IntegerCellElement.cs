@@ -13,7 +13,7 @@ namespace JumboExcel.Structure
         /// </summary>
         /// <param name="number">Value or null.</param>
         /// <param name="style">Style.</param>
-        public IntegerCellElement(Int64? number, NumberStyleDefinition style = null)
+        public IntegerCellElement(Int64? number, NumberStyleDefinition style = default(NumberStyleDefinition))
             : base(number, style)
         {
         }

@@ -1,7 +1,6 @@
 using System;
 using System.Drawing;
 using System.Linq;
-using JumboExcel.Formatting;
 using JumboExcel.Styling;
 using NUnit.Framework;
 
@@ -34,16 +33,8 @@ namespace JumboExcel
                 from fontWeight in new[] {FontWeight.Normal, FontWeight.Bold}
                 from border in new[] {BorderDefinition.None, BorderDefinition.All}
                 from fillColor in new Color?[] {null, Color.Bisque, Color.Azure}
-                from definitions in new CellStyleDefinition[]
-                {
-                    new StringStyleDefinition(new FontDefinition(typeface, size, color, fontSlope, fontWeight), border, fillColor),
-                    new NumberStyleDefinition(NumberFormat.Default, new FontDefinition(typeface, size, color, fontSlope, fontWeight), border, fillColor),
-                    new NumberStyleDefinition(IntegerFormat.General, new FontDefinition(typeface, size, color, fontSlope, fontWeight), border, fillColor),
-                    new NumberStyleDefinition(null, new FontDefinition(typeface, size, color, fontSlope, fontWeight), border, fillColor),
-                    new DateStyleDefinition(new DateTimeFormat(-1, "yyyy"), new FontDefinition(typeface, size, color, fontSlope, fontWeight), border, fillColor),
-                    new DateStyleDefinition(null, new FontDefinition(typeface, size, color, fontSlope, fontWeight), border, fillColor),
-                }
-                select definitions;
+                from format in new[] { null, "0"}
+                select new CellStyleDefinition(new FontDefinition(typeface, size, color, fontSlope, fontWeight), border, fillColor, format);
 
             var items = q.ToArray();
 

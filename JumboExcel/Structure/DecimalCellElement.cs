@@ -8,7 +8,7 @@ namespace JumboExcel.Structure
     /// </summary>
     public sealed class DecimalCellElement : NumberCell<decimal>
     {
-        public DecimalCellElement(Decimal? number, NumberStyleDefinition style = null) : base(number, style)
+        public DecimalCellElement(Decimal? number, NumberStyleDefinition style = default(NumberStyleDefinition)) : base(number, style)
         {
         }
 

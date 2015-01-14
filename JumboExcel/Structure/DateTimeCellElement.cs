@@ -18,7 +18,7 @@ namespace JumboExcel.Structure
         /// </summary>
         /// <param name="dateTime">Value to display in the cell.</param>
         /// <param name="style">Optional Style.</param>
-        public DateTimeCellElement(DateTime dateTime, DateStyleDefinition style = null) : base(dateTime)
+        public DateTimeCellElement(DateTime dateTime, DateStyleDefinition style = default(DateStyleDefinition)) : base(dateTime)
         {
             Style = style;
         }

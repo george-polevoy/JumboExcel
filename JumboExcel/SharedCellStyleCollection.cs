@@ -54,7 +54,7 @@ namespace JumboExcel
 
         public Cell AllocateDateCell(DateStyleDefinition cellStyleDefinition, CellValues cellValueType)
         {
-            var option = AllocateCellOption(cellStyleDefinition);
+            var option = AllocateCellOption(cellStyleDefinition.CellStyleDefinition);
             if (option.DateCell != null) return option.DateCell;
             var cell = CreateCell(cellValueType, option.Index);
             option.DateCell = cell;
@@ -63,7 +63,7 @@ namespace JumboExcel
 
         public Cell AllocateNumberCell(NumberStyleDefinition cellStyleDefinition, CellValues cellValueType)
         {
-            var option = AllocateCellOption(cellStyleDefinition);
+            var option = AllocateCellOption(cellStyleDefinition.CellStyleDefinition);
             if (option.NumberCell != null) return option.NumberCell;
             var cell = CreateCell(cellValueType, option.Index);
             option.NumberCell = cell;
@@ -72,7 +72,7 @@ namespace JumboExcel
 
         public Cell AllocateStringCell(StringStyleDefinition cellStyleDefinition, CellValues cellValueType)
         {
-            var option = AllocateCellOption(cellStyleDefinition);
+            var option = AllocateCellOption(cellStyleDefinition.CellStyleDefinition);
             if (option.StringCell != null) return option.StringCell;
             var cell = CreateCell(cellValueType, option.Index);
             option.StringCell = cell;
@@ -81,7 +81,7 @@ namespace JumboExcel
 
         public Cell AllocateSharedStringCell(SharedStringStyleDefinition cellStyleDefinition, CellValues cellValueType)
         {
-            var option = AllocateCellOption(cellStyleDefinition);
+            var option = AllocateCellOption(cellStyleDefinition.CellStyleDefinition);
             if (option.SharedStringCell != null) return option.SharedStringCell;
             var cell = CreateCell(cellValueType, option.Index);
             option.SharedStringCell = cell;

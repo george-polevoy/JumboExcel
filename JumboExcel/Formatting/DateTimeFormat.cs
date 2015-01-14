@@ -4,6 +4,10 @@ namespace JumboExcel.Formatting
 {
     public class DateTimeFormat : CommonValueFormat
     {
+        public DateTimeFormat(string format) : base(-1, format)
+        {
+        }
+
         internal DateTimeFormat(int id, string formatCode) : base(id, formatCode)
         {
         }

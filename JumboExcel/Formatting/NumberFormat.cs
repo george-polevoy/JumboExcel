@@ -3,7 +3,7 @@ namespace JumboExcel.Formatting
     public class NumberFormat : CommonValueFormat
     {
         /// <summary>
-        /// Predefined number format <c>General</c>.
+        /// Predefined number format <c>""</c>. Renders integer numbers as decimal, and fractional numbers as decimal with unspecified decimal places after the separator.
         /// </summary>
         internal static readonly IntegerFormat Default = new IntegerFormat(0, "");
 

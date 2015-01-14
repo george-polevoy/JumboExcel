@@ -14,10 +14,12 @@ namespace JumboExcel.Structure
         }
 
         private readonly string value;
+        
         public SharedStringStyleDefinition Style { get; private set; }
+        
         public string Value { get { return value; } }
 
-        public SharedStringElement(string value, SharedStringStyleDefinition style = null)
+        public SharedStringElement(string value, SharedStringStyleDefinition style = default(SharedStringStyleDefinition))
         {
             this.value = value;
             Style = style;

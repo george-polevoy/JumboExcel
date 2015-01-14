@@ -148,7 +148,14 @@ namespace JumboExcel
             yield return RowForType(new DecimalCellElement(123456.7890123m, conditional), "Conditional colored.");
             yield return RowForType(new DecimalCellElement(0m, conditional), "Conditional colored.");
             yield return RowForType(new DecimalCellElement(-123456.7890123m, conditional), "Conditional colored.");
-            
+            yield return RowForType(new IntegerCellElement(100L), "new IntegerCellElement(100L)");
+            yield return RowForType(new DecimalCellElement(123.123m), "new DecimalCellElement(123.123m)");
+            yield return RowForType(new IntegerCellElement(100000000L, new NumberStyleDefinition(default(NumberFormat), null, BorderDefinition.None)), "default(NumberFormat)");
+            yield return RowForType(new IntegerCellElement(100000000L, new NumberStyleDefinition(NumberFormat.Default, null, BorderDefinition.None)), "NumberFormat.Default");
+            yield return RowForType(new IntegerCellElement(100000000L, new NumberStyleDefinition(IntegerFormat.General, null, BorderDefinition.None)), "IntegerFormat.General");
+            yield return RowForType(new DecimalCellElement(123.456m, new NumberStyleDefinition(default(NumberFormat), null, BorderDefinition.None)), "default(NumberFormat)");
+            yield return RowForType(new DecimalCellElement(123.123m, new NumberStyleDefinition(NumberFormat.Default, null, BorderDefinition.None)), "NumberFormat.Default");
+            yield return RowForType(new DecimalCellElement(123.123m, new NumberStyleDefinition(IntegerFormat.General, null, BorderDefinition.None)), "IntegerFormat.General");
             foreach (var format in IntegerFormat.GetIntegerFormats())
             {
                 var numberStyleDefinition = new NumberStyleDefinition(format, null, BorderDefinition.None, null);
@@ -158,7 +165,6 @@ namespace JumboExcel
                     yield return RowForType(new IntegerCellElement(value), GetNoStyleComment(value.ToString(CultureInfo.InvariantCulture)));
                 }
             }
-
             foreach (var format in DecimalFormat.GetDecimalFormats())
             {
                 var numberStyleDefinition = new NumberStyleDefinition(format, null, BorderDefinition.None, null);
@@ -168,10 +174,9 @@ namespace JumboExcel
                     yield return RowForType(new DecimalCellElement(value), GetNoStyleComment(value.ToString(CultureInfo.InvariantCulture)));
                 }
             }
-
             var dateValue = new DateTime(2014, 12, 29, 16, 35, 56).AddMilliseconds(125);
-            yield return RowForType(new DateTimeCellElement(dateValue), GetNoStyleComment(dateValue.ToString("u")));
-            foreach (var format in DateTimeFormat.GetDateTimeFormats())
+            var customDateFormats = new[] {default(DateTimeFormat), new DateTimeFormat("m/d/yy H:mm:ss")};
+            foreach (var format in DateTimeFormat.GetDateTimeFormats().Concat(customDateFormats))
             {
                 yield return RowForType(new DateTimeCellElement(dateValue, new DateStyleDefinition(format, null, BorderDefinition.None, null)), GetValueFormatComment(format, dateValue.ToString("u")));
             }
@@ -184,7 +189,7 @@ namespace JumboExcel
 
         private static string GetValueFormatComment(CommonValueFormat numberFormat, string value)
         {
-            return string.Format("Format: \"{0}\", value: {1}", numberFormat.FormatCode, value);
+            return string.Format("Format: \"{0}\", value: {1}", numberFormat != null ? numberFormat.FormatCode : null, value);
         }
 
         private static RowElement RowForType<T>(T element, string comment = "") where T : CellElement
