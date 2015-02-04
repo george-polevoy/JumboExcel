@@ -6,19 +6,19 @@ namespace JumboExcel.Structure
     /// <summary>
     /// Represents nullable cell.
     /// </summary>
-    public sealed class IntegerCellElement : NumberCell<Int64>
+    public sealed class IntegerCell : NumberCell<Int64>
     {
         /// <summary>
         /// Constructor, taking a nullable value and style definition.
         /// </summary>
         /// <param name="number">Value or null.</param>
         /// <param name="style">Style.</param>
-        public IntegerCellElement(Int64? number, NumberStyleDefinition style = default(NumberStyleDefinition))
+        public IntegerCell(Int64? number, NumberStyle style = default(NumberStyle))
             : base(number, style)
         {
         }
 
-        public override void Accept(IElementVisitor visitor)
+        internal override void Accept(IElementVisitor visitor)
         {
             visitor.Visit(this);
         }

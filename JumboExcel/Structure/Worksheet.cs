@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace JumboExcel.Structure
@@ -10,7 +11,7 @@ namespace JumboExcel.Structure
         /// <summary>
         /// Column configurations.
         /// </summary>
-        public IEnumerable<ColumnElement> ColumnElements { get; private set; }
+        public IEnumerable<ColumnConfiguration> ColumnConfigurations { get; private set; }
 
         /// <summary>
         /// Specifies, if the summary rows are belo the grouped rows.
@@ -34,12 +35,12 @@ namespace JumboExcel.Structure
         /// </summary>
         /// <param name="belo">Specifies if the summary rows are belo the grouped rows.</param>
         /// <param name="right">Specifies, if the summary columns are at the right of grouped columns (Grouped collumns are not supported in this implementation).</param>
-        /// <param name="columnElements">Column configurations.</param>
-        public WorksheetParametersElement(bool belo, bool right, IEnumerable<ColumnElement> columnElements = null)
+        /// <param name="columnConfigurations">Column configurations.</param>
+        public WorksheetParametersElement(bool belo, bool right, IEnumerable<ColumnConfiguration> columnConfigurations = null)
         {
             Belo = belo;
             Right = right;
-            ColumnElements = columnElements;
+            ColumnConfigurations = columnConfigurations;
         }
 
         /// <summary>
@@ -47,36 +48,44 @@ namespace JumboExcel.Structure
         /// </summary>
         /// <param name="belo">Specifies if the summary rows are belo the grouped rows.</param>
         /// <param name="right">Specifies, if the summary columns are at the right of grouped columns (Grouped collumns are not supported in this implementation).</param>
-        /// <param name="columnElements">Column configurations.</param>
-        public WorksheetParametersElement(bool belo, bool right, params ColumnElement[] columnElements)
+        /// <param name="columnConfigurations">Column configurations.</param>
+        public WorksheetParametersElement(bool belo, bool right, params ColumnConfiguration[] columnConfigurations)
         {
             Belo = belo;
             Right = right;
-            ColumnElements = columnElements;
+            ColumnConfigurations = columnConfigurations;
         }
     }
 
-    public class WorksheetElement : DocumentElement
+    public sealed class Worksheet : DocumentElement
     {
+        const int MAX_NAME_LENGTH = 31;
+
         public WorksheetParametersElement Parameters { get; private set; }
-        public IEnumerable<RowLevelElement> RowsLevelElements { get; set; }
-        public string Name { get; set; }
+
+        public IEnumerable<RowLevelElement> RowsLevelElements { get; private set; }
+
+        public string Name { get; private set; }
         
-        public WorksheetElement(string name, WorksheetParametersElement parameters, IEnumerable<RowLevelElement> rowsLevelElements)
+        public Worksheet(string name, WorksheetParametersElement parameters, IEnumerable<RowLevelElement> rowsLevelElements)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentNullException("name");
+            if (name.Length > MAX_NAME_LENGTH)
+                throw new ArgumentOutOfRangeException("name", name, "Name length must be < 32");
+            Name = name;
+            Parameters = parameters;
+            RowsLevelElements = rowsLevelElements;
+        }
+
+        public Worksheet(string name, WorksheetParametersElement parameters, params RowLevelElement[] rowsLevelElements)
         {
             Name = name;
             Parameters = parameters;
             RowsLevelElements = rowsLevelElements;
         }
 
-        public WorksheetElement(string name, WorksheetParametersElement parameters, params RowLevelElement[] rowsLevelElements)
-        {
-            Name = name;
-            Parameters = parameters;
-            RowsLevelElements = rowsLevelElements;
-        }
-
-        public override void Accept(IElementVisitor visitor)
+        internal override void Accept(IElementVisitor visitor)
         {
             visitor.Visit(this);
         }

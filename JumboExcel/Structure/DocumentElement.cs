@@ -5,6 +5,6 @@ namespace JumboExcel.Structure
     /// </summary>
     public abstract class DocumentElement
     {
-        public abstract void Accept(IElementVisitor visitor);
+        internal abstract void Accept(IElementVisitor visitor);
     }
 }

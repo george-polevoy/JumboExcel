@@ -3,10 +3,11 @@ using JumboExcel.Styling;
 namespace JumboExcel.Structure
 {
     /// <summary>
-    /// Represents inline string. Use this class to represent cells with uncommon values. For large values that are likely to repeat among the worksheets, use <see cref="SharedStringElement"/>.
+    /// Represents an inline string. For strings that represent short values, and are likely to appear only a few times.
+    /// For large values that are likely to repeat among the worksheets, use <see cref="SharedString"/>.
     /// </summary>
     /// <remarks>http://stackoverflow.com/questions/6468783/what-is-the-difference-between-cellvalues-inlinestring-and-cellvalues-string-in</remarks>
-    public class InlineStringElement : CellElement
+    public sealed class InlineString : CellElement
     {
         /// <summary>
         /// Value.
@@ -16,9 +17,9 @@ namespace JumboExcel.Structure
         /// <summary>
         /// Style.
         /// </summary>
-        public StringStyleDefinition Style { get; set; }
+        public StringStyle Style { get; private set; }
 
-        public InlineStringElement(string value, StringStyleDefinition style = default(StringStyleDefinition))
+        public InlineString(string value, StringStyle style = default(StringStyle))
         {
             this.value = value;
             Style = style;
@@ -29,7 +30,7 @@ namespace JumboExcel.Structure
         /// </summary>
         public string Value { get { return value; } }
 
-        public override void Accept(IElementVisitor visitor)
+        internal override void Accept(IElementVisitor visitor)
         {
             visitor.Visit(this);
         }

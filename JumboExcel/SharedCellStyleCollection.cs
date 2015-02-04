@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Spreadsheet;
 using JumboExcel.Styling;
+using CellStyle = JumboExcel.Styling.CellStyle;
 
 namespace JumboExcel
 {
@@ -21,74 +22,74 @@ namespace JumboExcel
         public int Index { get; private set; }
 
         /// <summary>
-        /// Cached cell instance for represented style, for <see cref="NumberStyleDefinition"/>
+        /// Cached cell instance for represented style, for <see cref="NumberStyle"/>
         /// </summary>
         public Cell NumberCell { get; set; }
 
         /// <summary>
-        /// Cached cell instance for represented style, for <see cref="DateStyleDefinition"/>
+        /// Cached cell instance for represented style, for <see cref="DateStyle"/>
         /// </summary>
         public Cell DateCell { get; set; }
 
         /// <summary>
-        /// Cached cell instance for represented style, for <see cref="StringStyleDefinition"/>
+        /// Cached cell instance for represented style, for <see cref="StringStyle"/>
         /// </summary>
         public Cell StringCell { get; set; }
 
         /// <summary>
-        /// Cached cell instance for represented style, for <see cref="SharedStringStyleDefinition"/>
+        /// Cached cell instance for represented style, for <see cref="StringStyle"/>
         /// </summary>
         public Cell SharedStringCell { get; set; }
 
         /// <summary>
-        /// Cached cell instance for represented style, for <see cref="BooleanStyleDefinition"/>
+        /// Cached cell instance for represented style, for <see cref="BooleanStyle"/>
         /// </summary>
         public Cell BooleanCell { get; set; }
     }
 
     class SharedCellStyleCollection
     {
-        private readonly SharedElementCollection<CellStyleDefinition> cellStyleDefinitions;
+        private readonly SharedElementCollection<CellStyle> cellStyleDefinitions;
         private readonly int cellFormatIndexCorrelation;
 
         private readonly List<CellStyleOption> allocatedSampleCells = new List<CellStyleOption>();
         
-        public SharedCellStyleCollection(SharedElementCollection<CellStyleDefinition> sharedElementCollection, int cellFormatIndexCorrelation)
+        public SharedCellStyleCollection(SharedElementCollection<CellStyle> sharedElementCollection, int cellFormatIndexCorrelation)
         {
             cellStyleDefinitions = sharedElementCollection;
             this.cellFormatIndexCorrelation = cellFormatIndexCorrelation;
         }
 
-        public Cell AllocateDateCell(DateStyleDefinition cellStyleDefinition, CellValues cellValueType)
+        public Cell AllocateDateCell(DateStyle cellStyle, CellValues cellValueType)
         {
-            var option = AllocateCellOption(cellStyleDefinition.CellStyleDefinition);
+            var option = AllocateCellOption(cellStyle.cellStyle);
             if (option.DateCell != null) return option.DateCell;
             var cell = CreateCell(cellValueType, option.Index);
             option.DateCell = cell;
             return cell;
         }
 
-        public Cell AllocateNumberCell(NumberStyleDefinition cellStyleDefinition, CellValues cellValueType)
+        public Cell AllocateNumberCell(NumberStyle cellStyle, CellValues cellValueType)
         {
-            var option = AllocateCellOption(cellStyleDefinition.CellStyleDefinition);
+            var option = AllocateCellOption(cellStyle.cellStyle);
             if (option.NumberCell != null) return option.NumberCell;
             var cell = CreateCell(cellValueType, option.Index);
             option.NumberCell = cell;
             return cell;
         }
 
-        public Cell AllocateStringCell(StringStyleDefinition cellStyleDefinition, CellValues cellValueType)
+        public Cell AllocateStringCell(StringStyle cellStyle, CellValues cellValueType)
         {
-            var option = AllocateCellOption(cellStyleDefinition.CellStyleDefinition);
+            var option = AllocateCellOption(cellStyle.cellStyle);
             if (option.StringCell != null) return option.StringCell;
             var cell = CreateCell(cellValueType, option.Index);
             option.StringCell = cell;
             return cell;
         }
 
-        public Cell AllocateSharedStringCell(StringStyleDefinition cellStyleDefinition, CellValues cellValueType)
+        public Cell AllocateSharedStringCell(StringStyle cellStyle, CellValues cellValueType)
         {
-            var option = AllocateCellOption(cellStyleDefinition.CellStyleDefinition);
+            var option = AllocateCellOption(cellStyle.cellStyle);
             if (option.SharedStringCell != null) return option.SharedStringCell;
             var cell = CreateCell(cellValueType, option.Index);
             option.SharedStringCell = cell;
@@ -104,9 +105,9 @@ namespace JumboExcel
             return cell;
         }
 
-        private CellStyleOption AllocateCellOption(CellStyleDefinition cellStyleDefinition)
+        private CellStyleOption AllocateCellOption(CellStyle cellStyle)
         {
-            var index = cellStyleDefinitions.GetOrAllocateElement(cellStyleDefinition);
+            var index = cellStyleDefinitions.GetOrAllocateElement(cellStyle);
             if (index < allocatedSampleCells.Count)
                 return allocatedSampleCells[index];
             var cellStyleOption = new CellStyleOption((allocatedSampleCells.Count + cellFormatIndexCorrelation));
@@ -114,9 +115,9 @@ namespace JumboExcel
             return cellStyleOption;
         }
 
-        public Cell AllocateBooleanCell(BooleanStyleDefinition cellStyleDefinition, CellValues cellValueType)
+        public Cell AllocateBooleanCell(BooleanStyle cellStyleDefinition, CellValues cellValueType)
         {
-            var option = AllocateCellOption(cellStyleDefinition.CellStyleDefinition);
+            var option = AllocateCellOption(cellStyleDefinition.cellStyle);
             if (option.SharedStringCell != null) return option.BooleanCell;
             var cell = CreateCell(cellValueType, option.Index);
             option.BooleanCell = cell;

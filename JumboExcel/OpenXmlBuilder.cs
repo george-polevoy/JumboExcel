@@ -6,9 +6,13 @@ using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using JumboExcel.Formatting;
-using JumboExcel.Structure;
 using JumboExcel.Styling;
+using JumboExcel.Structure;
+using Border = JumboExcel.Styling.Border;
+using CellStyle = JumboExcel.Styling.CellStyle;
+using Font = JumboExcel.Styling.Font;
 using Tuple = System.Tuple;
+using Worksheet = JumboExcel.Structure.Worksheet;
 
 namespace JumboExcel
 {
@@ -20,15 +24,20 @@ namespace JumboExcel
         /// <summary>
         /// Specifies the lowest safe value to use as a custom number format, not to interfere with built-in number formats.
         /// </summary>
-        private readonly static int BaseCustomFormatId = 165;
+        const int BASE_CUSTOM_FORMAT_ID = 165;
+
+        /// <summary>
+        /// Private constructor to disallow re-entrance of the methods.
+        /// </summary>
+        private OpenXmlBuilder() { }
 
         /// <summary>
         /// Default border definitions.
         /// </summary>
-        private readonly Border[] defaultBorders = 
+        private readonly DocumentFormat.OpenXml.Spreadsheet.Border[] defaultBorders = 
         {
-            new Border(new LeftBorder(),new RightBorder(),new TopBorder(),new BottomBorder(),new DiagonalBorder()),
-            new Border(
+            new DocumentFormat.OpenXml.Spreadsheet.Border(new LeftBorder(),new RightBorder(),new TopBorder(),new BottomBorder(),new DiagonalBorder()),
+            new DocumentFormat.OpenXml.Spreadsheet.Border(
                 new LeftBorder(new Color { Auto = true, }) { Style = BorderStyleValues.Thin },
                 new RightBorder(new Color { Auto = true }) { Style = BorderStyleValues.Thin },
                 new TopBorder(new Color { Auto = true }) { Style = BorderStyleValues.Thin },
@@ -54,21 +63,46 @@ namespace JumboExcel
         /// <summary>
         /// Default font definitions.
         /// </summary>
-        private readonly Font[] defaultFonts = { new Font(new FontSize { Val = 11 }, new Color { Rgb = new HexBinaryValue { Value = "000000" } }, new FontName { Val = "Calibri" }) };
+        private readonly DocumentFormat.OpenXml.Spreadsheet.Font[] defaultFonts = { new DocumentFormat.OpenXml.Spreadsheet.Font(new FontSize { Val = 11 }, new Color { Rgb = new HexBinaryValue { Value = "000000" } }, new FontName { Val = "Calibri" }) };
 
         /// <summary>
         /// Writes <see cref="DocumentElement"/> hierarchy to the provided <see cref="Stream"/>.
+        /// This method is not thread safe. To provide thread safety, provide your own synchronization.
         /// </summary>
         /// <param name="outputStream">Stream to write to.</param>
         /// <param name="worksheets">Worksheets for the excel document.</param>
-        public void Write(Stream outputStream, IEnumerable<WorksheetElement> worksheets)
+        public static void Write(Stream outputStream, IEnumerable<Worksheet> worksheets)
+        {
+            new OpenXmlBuilder().WriteInternal(outputStream, worksheets);
+        }
+
+        /// <summary>
+        /// Writes <see cref="DocumentElement"/> hierarchy to the provided <see cref="Stream"/>.
+        /// This method is not thread safe. To provide thread safety, provide your own synchronization.
+        /// </summary>
+        /// <param name="outputStream">Stream to write to.</param>
+        /// <param name="worksheets">Worksheets for the excel document.</param>
+        /// <returns>Returns an <see cref="IEnumerable{TProgress}"/> which must be enumerated to the end to complete the file generation.</returns>
+        public static IEnumerable<TProgress> WriteWithProgress<TProgress>(Stream outputStream, IEnumerable<ProgressingWorksheet<TProgress>> worksheets)
+        {
+            return new OpenXmlBuilder().WriteWithProgressInternal(outputStream, worksheets);
+        }
+
+        /// <summary>
+        /// Writes <see cref="DocumentElement"/> hierarchy to the provided <see cref="Stream"/>.
+        /// This method must not be reentered.
+        /// This method is not thread safe. To provide thread safety, provide your own synchronization.
+        /// </summary>
+        /// <param name="outputStream">Stream to write to.</param>
+        /// <param name="worksheets">Worksheets for the excel document.</param>
+        private void WriteInternal(Stream outputStream, IEnumerable<Worksheet> worksheets)
         {
             var worksheetParts = new List<Tuple<WorksheetPart, string>>();
             using (var spreadsheetDocument = SpreadsheetDocument.Create(outputStream, SpreadsheetDocumentType.Workbook))
             {
                 var workbookPart = spreadsheetDocument.AddWorkbookPart();
                 var sharedStrings = new SharedElementCollection<string>();
-                var sharedStylesCollection = new SharedElementCollection<CellStyleDefinition>();
+                var sharedStylesCollection = new SharedElementCollection<CellStyle>();
                 var sharedStyles = new SharedCellStyleCollection(sharedStylesCollection, defaultCellFormats.Length);
                 foreach (var worksheetElement in worksheets)
                 {
@@ -85,13 +119,49 @@ namespace JumboExcel
                 AddSharedStyles(spreadsheetDocument, sharedStylesCollection);
             }
         }
+        
+        /// <summary>
+        /// Writes <see cref="DocumentElement"/> hierarchy to the provided <see cref="Stream"/>.
+        /// This method must not be reentered.
+        /// This method is not thread safe. To provide thread safety, provide your own synchronization.
+        /// </summary>
+        /// <param name="outputStream">Stream to write to.</param>
+        /// <param name="worksheets">Worksheets for the excel document.</param>
+        /// <returns>Returns an <see cref="IEnumerable{TProgress}"/> which must be enumerated to complete the file generation.</returns>
+        private IEnumerable<TProgress> WriteWithProgressInternal<TProgress>(Stream outputStream, IEnumerable<ProgressingWorksheet<TProgress>> worksheets)
+        {
+            var worksheetParts = new List<Tuple<WorksheetPart, string>>();
+            using (var spreadsheetDocument = SpreadsheetDocument.Create(outputStream, SpreadsheetDocumentType.Workbook))
+            {
+                var workbookPart = spreadsheetDocument.AddWorkbookPart();
+                var sharedStrings = new SharedElementCollection<string>();
+                var sharedStylesCollection = new SharedElementCollection<CellStyle>();
+                var sharedStyles = new SharedCellStyleCollection(sharedStylesCollection, defaultCellFormats.Length);
+                foreach (var worksheetElement in worksheets)
+                {
+                    var worksheetPart = workbookPart.AddNewPart<WorksheetPart>();
+                    worksheetParts.Add(Tuple.Create(worksheetPart, worksheetElement.Name));
+                    using (var worksheetPartWriter = OpenXmlWriter.Create(worksheetPart))
+                    {
+                        var elementVisitor = new OpenXmlElementVisitor(worksheetPartWriter, sharedStrings, sharedStyles);
+                        foreach (var p in elementVisitor.VisitProgressingWorksheet(worksheetElement))
+                        {
+                            yield return p;
+                        }
+                    }
+                }
+                AddWorksheetReferences(worksheetParts, workbookPart);
+                AddSharedStrings(spreadsheetDocument, sharedStrings);
+                AddSharedStyles(spreadsheetDocument, sharedStylesCollection);
+            }
+        }
 
         /// <summary>
         /// Writes styles part to the document.
         /// </summary>
         /// <param name="spreadsheetDocument">Document.</param>
         /// <param name="sharedStyles">Styles, accumulated during worksheet parts generation.</param>
-        private void AddSharedStyles(SpreadsheetDocument spreadsheetDocument, SharedElementCollection<CellStyleDefinition> sharedStyles)
+        private void AddSharedStyles(SpreadsheetDocument spreadsheetDocument, SharedElementCollection<CellStyle> sharedStyles)
         {
             if (sharedStyles.Count <= 0) return;
             var stylesPart = spreadsheetDocument.WorkbookPart.AddNewPart<WorkbookStylesPart>();
@@ -120,20 +190,18 @@ namespace JumboExcel
         /// </summary>
         /// <param name="worksheetParts">Named worksheet parts.</param>
         /// <param name="workbookPart">Workbook part, representing entire document.</param>
-        private static void AddWorksheetReferences(List<Tuple<WorksheetPart, string>> worksheetParts, WorkbookPart workbookPart)
+        private static void AddWorksheetReferences(ICollection<Tuple<WorksheetPart, string>> worksheetParts, WorkbookPart workbookPart)
         {
-            if (worksheetParts.Any())
+            if (worksheetParts.Count <= 0) return;
+            using (var workbookPartWriter = OpenXmlWriter.Create(workbookPart))
             {
-                using (var workbookPartWriter = OpenXmlWriter.Create(workbookPart))
-                {
-                    workbookPartWriter.WriteElement(new Workbook(new Sheets(worksheetParts.Select((item, index) =>
-                        new Sheet
-                        {
-                            Name = item.Item2,
-                            SheetId = (uint)index + 1,
-                            Id = workbookPart.GetIdOfPart(item.Item1)
-                        }))));
-                }
+                workbookPartWriter.WriteElement(new Workbook(new Sheets(worksheetParts.Select((item, index) =>
+                    new Sheet
+                    {
+                        Name = item.Item2,
+                        SheetId = (uint)index + 1,
+                        Id = workbookPart.GetIdOfPart(item.Item1)
+                    }))));
             }
         }
 
@@ -152,13 +220,13 @@ namespace JumboExcel
         /// </summary>
         /// <param name="sharedStylesCollection">Shared styles, accumulated during worksheet parts generation.</param>
         /// <returns>Returns DOM stylesheet part for the entire document.</returns>
-        private Stylesheet GenerateStyleSheet(SharedElementCollection<CellStyleDefinition> sharedStylesCollection)
+        private Stylesheet GenerateStyleSheet(SharedElementCollection<CellStyle> sharedStylesCollection)
         {
             var commonNumberFormats = CommonValueFormat.GetFormats().ToDictionary(i => i.FormatCode);
             var customNumberFormats = new SharedElementCollection<string>();
-            var fontDefinitions = new SharedElementCollection<FontDefinition>();
+            var fontDefinitions = new SharedElementCollection<Font>();
             var fillDefinitions = new SharedElementCollection<System.Drawing.Color>();
-            var borderDefinitions = new SharedElementCollection<BorderDefinition>();
+            var borderDefinitions = new SharedElementCollection<Border>();
             foreach (var style in sharedStylesCollection.GetAll())
             {
                 if (style.Format != null)
@@ -167,17 +235,17 @@ namespace JumboExcel
                     if (!commonNumberFormats.TryGetValue(style.Format, out commonValueFormat))
                         customNumberFormats.GetOrAllocateElement(style.Format);
                 }
-                if (style.FontDefinition != null)
-                    fontDefinitions.GetOrAllocateElement(style.FontDefinition);
+                if (style.Font != null)
+                    fontDefinitions.GetOrAllocateElement(style.Font);
                 if (style.FillColor != null)
                     fillDefinitions.GetOrAllocateElement(style.FillColor.Value);
-                if (style.BorderDefinition != BorderDefinition.None && style.BorderDefinition != BorderDefinition.All)
-                    borderDefinitions.GetOrAllocateElement(style.BorderDefinition);
+                if (style.Border != Border.NONE && style.Border != Border.ALL)
+                    borderDefinitions.GetOrAllocateElement(style.Border);
             }
             var numberFormatsCount = defaultNumberingFormats.Length + customNumberFormats.Count;
             return new Stylesheet(
                 new NumberingFormats(defaultNumberingFormats.Concat(
-                    customNumberFormats.GetAll().Select((formatCode, index) => new NumberingFormat {NumberFormatId = (uint) (BaseCustomFormatId + index), FormatCode = formatCode})
+                    customNumberFormats.GetAll().Select((formatCode, index) => new NumberingFormat {NumberFormatId = (uint) (BASE_CUSTOM_FORMAT_ID + index), FormatCode = formatCode})
                     )) {Count = (uint) numberFormatsCount},
                 new Fonts(defaultFonts.Concat(
                     fontDefinitions.GetAll().Select(CreateFont))),
@@ -207,14 +275,14 @@ namespace JumboExcel
         /// <param name="customNumberFormats">Accumulated shared component.</param>
         /// <returns>Returns the new element, corresponding to the <paramref name="style"/> provided.</returns>
         private CellFormat CreateCellFormat(
-            CellStyleDefinition style, SharedElementCollection<FontDefinition> fontDefinitions, SharedElementCollection<System.Drawing.Color> fillDefinitions,
-            SharedElementCollection<BorderDefinition> borderDefinitions, IDictionary<string, CommonValueFormat> commonValueFormats,
+            CellStyle style, SharedElementCollection<Font> fontDefinitions, SharedElementCollection<System.Drawing.Color> fillDefinitions,
+            SharedElementCollection<Border> borderDefinitions, IDictionary<string, CommonValueFormat> commonValueFormats,
             SharedElementCollection<string> customNumberFormats)
         {
             var cellFormat = new CellFormat();
 
-            cellFormat.FontId = style.FontDefinition == null ? 0 : (uint) (fontDefinitions.GetElementIndex(style.FontDefinition) + defaultFonts.Length);
-            if (style.FontDefinition != null)
+            cellFormat.FontId = style.Font == null ? 0 : (uint) (fontDefinitions.GetElementIndex(style.Font) + defaultFonts.Length);
+            if (style.Font != null)
             {
                 cellFormat.ApplyFont = true;
             }
@@ -225,17 +293,17 @@ namespace JumboExcel
             if (style.FillColor != null)
                 cellFormat.ApplyFill = true;
 
-            switch (style.BorderDefinition)
+            switch (style.Border)
             {
-                case BorderDefinition.None:
+                case Border.NONE:
                     cellFormat.BorderId = 0;
                     break;
-                case BorderDefinition.All:
+                case Border.ALL:
                     cellFormat.BorderId = 1;
                     cellFormat.ApplyBorder = true;
                     break;
                 default:
-                    cellFormat.BorderId = (uint) (borderDefinitions.GetElementIndex(style.BorderDefinition) + defaultBorders.Length);
+                    cellFormat.BorderId = (uint) (borderDefinitions.GetElementIndex(style.Border) + defaultBorders.Length);
                     cellFormat.ApplyBorder = true;
                     break;
             }
@@ -250,7 +318,7 @@ namespace JumboExcel
                 }
                 else
                 {
-                    cellFormat.NumberFormatId = (uint) (customNumberFormats.GetElementIndex(style.Format) + BaseCustomFormatId);
+                    cellFormat.NumberFormatId = (uint) (customNumberFormats.GetElementIndex(style.Format) + BASE_CUSTOM_FORMAT_ID);
                 }
             }
 
@@ -258,41 +326,41 @@ namespace JumboExcel
         }
 
         /// <summary>
-        /// Generates <see cref="Border"/> DOM element for provided <see cref="BorderDefinition"/>
+        /// Generates <see cref="DocumentFormat.OpenXml.Spreadsheet.Border"/> DOM element for provided <see cref="Border"/>
         /// </summary>
         /// <param name="border">Border definition.</param>
-        private static Border CreateBorder(BorderDefinition border)
+        private static DocumentFormat.OpenXml.Spreadsheet.Border CreateBorder(Border border)
         {
             var elements = new List<OpenXmlElement>();
-            if (border.HasFlag(BorderDefinition.Left))
+            if (border.HasFlag(Border.LEFT))
                 elements.Add(new LeftBorder(new Color { Auto = true }) { Style = BorderStyleValues.Thin });
-            if (border.HasFlag(BorderDefinition.Right))
+            if (border.HasFlag(Border.RIGHT))
                 elements.Add(new RightBorder(new Color { Auto = true }) { Style = BorderStyleValues.Thin });
-            if (border.HasFlag(BorderDefinition.Top))
+            if (border.HasFlag(Border.TOP))
                 elements.Add(new TopBorder(new Color { Auto = true }) { Style = BorderStyleValues.Thin });
-            if (border.HasFlag(BorderDefinition.Bottom))
+            if (border.HasFlag(Border.BOTTOM))
                 elements.Add(new BottomBorder(new Color { Auto = true }) { Style = BorderStyleValues.Thin });
             elements.Add(new DiagonalBorder());
-            return new Border(elements);
+            return new DocumentFormat.OpenXml.Spreadsheet.Border(elements);
         }
 
         /// <summary>
-        /// Generates <see cref="Font"/> DOM element for provided <see cref="FontDefinition"/>.
+        /// Generates <see cref="DocumentFormat.OpenXml.Spreadsheet.Font"/> DOM element for provided <see cref="Font"/>.
         /// </summary>
         /// <param name="font">Font definition.</param>
-        private static Font CreateFont(FontDefinition font)
+        private static DocumentFormat.OpenXml.Spreadsheet.Font CreateFont(Font font)
         {
             var elements = new List<OpenXmlElement>();
-            if (font.FontWeight == FontWeight.Bold)
+            if (font.FontWeight == FontWeight.BOLD)
                 elements.Add(new Bold());
-            if (font.FontSlope == FontSlope.Italic)
+            if (font.FontSlope == FontSlope.ITALIC)
                 elements.Add(new Italic());
             if (font.Typeface != null)
                 elements.Add(new FontName { Val = font.Typeface });
             elements.Add(new FontSize { Val = (double)font.Size });
             var color = font.Color;
             elements.Add(new Color { Rgb = new HexBinaryValue { Value = ToHex(color) } });
-            return new Font(elements);
+            return new DocumentFormat.OpenXml.Spreadsheet.Font(elements);
         }
     }
 }

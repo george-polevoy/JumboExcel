@@ -6,7 +6,7 @@ namespace JumboExcel.Styling
     /// <summary>
     /// Represents font definition.
     /// </summary>
-    public sealed class FontDefinition : IEquatable<FontDefinition>
+    public sealed class Font : IEquatable<Font>
     {
         /// <summary>
         /// Typeface of the font.
@@ -41,7 +41,7 @@ namespace JumboExcel.Styling
         /// <param name="color">Color.</param>
         /// <param name="fontSlope">Slope.</param>
         /// <param name="fontWeight">Weight.</param>
-        public FontDefinition(string typeface, decimal size, Color color, FontSlope fontSlope, FontWeight fontWeight)
+        public Font(string typeface, decimal size, Color color, FontSlope fontSlope, FontWeight fontWeight)
         {
             if (size < 0.1m || size > 500m)
                 throw new ArgumentOutOfRangeException("size", size, "Must be in range (0.1, 500.0)");
@@ -52,7 +52,7 @@ namespace JumboExcel.Styling
             FontSlope = fontSlope;
         }
 
-        public bool Equals(FontDefinition other)
+        public bool Equals(Font other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
@@ -63,7 +63,7 @@ namespace JumboExcel.Styling
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            return obj is FontDefinition && Equals((FontDefinition) obj);
+            return obj is Font && Equals((Font) obj);
         }
 
         public override int GetHashCode()
@@ -79,12 +79,12 @@ namespace JumboExcel.Styling
             }
         }
 
-        public static bool operator ==(FontDefinition left, FontDefinition right)
+        public static bool operator ==(Font left, Font right)
         {
             return Equals(left, right);
         }
 
-        public static bool operator !=(FontDefinition left, FontDefinition right)
+        public static bool operator !=(Font left, Font right)
         {
             return !Equals(left, right);
         }

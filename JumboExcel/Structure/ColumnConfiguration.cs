@@ -5,7 +5,7 @@ namespace JumboExcel.Structure
     /// <summary>
     /// Represents column configuration. Allows to specify widths.
     /// </summary>
-    public class ColumnElement
+    public sealed class ColumnConfiguration
     {
         /// <summary>
         /// Specifies the minimum column index to apply this configuration to.
@@ -28,7 +28,7 @@ namespace JumboExcel.Structure
         /// <param name="min">Specifies the minimum column index to apply this configuration to.</param>
         /// <param name="max">Specifies the maximum column index to apply this configuration to.</param>
         /// <param name="width">Width, in excel display units to apply to the column range.</param>
-        public ColumnElement(int min, int max, decimal width)
+        public ColumnConfiguration(int min, int max, decimal width)
         {
             if (min < 0)
                 throw new ArgumentOutOfRangeException("min", min, "Must be > 0.");

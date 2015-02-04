@@ -1,12 +1,11 @@
 using System.Drawing;
-using JumboExcel.Formatting;
 
 namespace JumboExcel.Styling
 {
     /// <summary>
-    /// Number style.
+    /// Boolean style.
     /// </summary>
-    public struct NumberStyle
+    public struct BooleanStyle
     {
         /// <summary>
         /// Shared cell style.
@@ -16,9 +15,9 @@ namespace JumboExcel.Styling
         /// <summary>
         /// Constructor.
         /// </summary>
-        public NumberStyle(NumberFormat format, Font font, Border border, Color? fillColor = default (Color?))
+        public BooleanStyle(Font font, Border border, Color? fillColor = default(Color?))
         {
-            cellStyle = new CellStyle(font, border, fillColor, (format ?? NumberFormat.Default).FormatCode);
+            cellStyle = new CellStyle(font, border, fillColor);
         }
     }
 }

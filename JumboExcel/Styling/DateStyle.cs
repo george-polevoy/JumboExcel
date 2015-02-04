@@ -4,9 +4,9 @@ using JumboExcel.Formatting;
 namespace JumboExcel.Styling
 {
     /// <summary>
-    /// Number style.
+    /// Date style.
     /// </summary>
-    public struct NumberStyle
+    public struct DateStyle
     {
         /// <summary>
         /// Shared cell style.
@@ -16,9 +16,9 @@ namespace JumboExcel.Styling
         /// <summary>
         /// Constructor.
         /// </summary>
-        public NumberStyle(NumberFormat format, Font font, Border border, Color? fillColor = default (Color?))
+        public DateStyle(DateTimeFormat format, Font font, Border border, Color? fillColor = default (Color?))
         {
-            cellStyle = new CellStyle(font, border, fillColor, (format ?? NumberFormat.Default).FormatCode);
+            cellStyle = new CellStyle(font, border, fillColor, (format ?? DateTimeFormat.DateDMmm).FormatCode);
         }
     }
 }

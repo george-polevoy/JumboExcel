@@ -5,7 +5,7 @@ namespace JumboExcel.Structure
     /// <summary>
     /// Represents row group, which can be collapsed.
     /// </summary>
-    public class RowGroupElement : RowLevelElement
+    public sealed class RowGroup : RowLevelElement
     {
         /// <summary>
         /// Child row level elements.
@@ -16,7 +16,7 @@ namespace JumboExcel.Structure
         /// Constructor.
         /// </summary>
         /// <param name="rowElements">Child row level elements.</param>
-        public RowGroupElement(IEnumerable<RowLevelElement> rowElements)
+        public RowGroup(IEnumerable<RowLevelElement> rowElements)
         {
             this.rowElements = rowElements;
         }
@@ -25,7 +25,7 @@ namespace JumboExcel.Structure
         /// Constructor.
         /// </summary>
         /// <param name="rowElements">Child row level elements.</param>
-        public RowGroupElement(params RowLevelElement[] rowElements)
+        public RowGroup(params RowLevelElement[] rowElements)
         {
             this.rowElements = rowElements;
         }
@@ -35,7 +35,7 @@ namespace JumboExcel.Structure
         /// </summary>
         public IEnumerable<RowLevelElement> RowElements { get { return rowElements; } }
 
-        public override void Accept(IElementVisitor visitor)
+        internal override void Accept(IElementVisitor visitor)
         {
             visitor.Visit(this);
         }

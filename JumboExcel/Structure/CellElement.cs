@@ -1,7 +1,7 @@
 namespace JumboExcel.Structure
 {
     /// <summary>
-    /// Base class for cell elements of Excel document.
+    /// Represents a single cell in an Excel document.
     /// </summary>
     public abstract class CellElement : DocumentElement
     {

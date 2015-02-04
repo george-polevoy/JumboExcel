@@ -6,17 +6,17 @@ namespace JumboExcel.Styling
     /// <summary>
     /// Represents style definition.
     /// </summary>
-    class CellStyleDefinition : IEquatable<CellStyleDefinition>
+    class CellStyle : IEquatable<CellStyle>
     {
         /// <summary>
         /// Font.
         /// </summary>
-        public FontDefinition FontDefinition { get; private set; }
+        public Font Font { get; private set; }
 
         /// <summary>
         /// Borders.
         /// </summary>
-        public BorderDefinition BorderDefinition { get; private set; }
+        public Border Border { get; private set; }
 
         /// <summary>
         /// Fill color.
@@ -31,23 +31,23 @@ namespace JumboExcel.Styling
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="fontDefinition">Font.</param>
-        /// <param name="borderDefinition">Borders.</param>
+        /// <param name="font">Font.</param>
+        /// <param name="border">Borders.</param>
         /// <param name="fillColor">Fill color.</param>
         /// <param name="format">Format.</param>
-        internal CellStyleDefinition(FontDefinition fontDefinition, BorderDefinition borderDefinition, Color? fillColor, string format = null)
+        internal CellStyle(Font font, Border border, Color? fillColor, string format = null)
         {
-            FontDefinition = fontDefinition;
-            BorderDefinition = borderDefinition;
+            Font = font;
+            Border = border;
             FillColor = fillColor;
             Format = format;
         }
 
-        public bool Equals(CellStyleDefinition other)
+        public bool Equals(CellStyle other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return string.Equals(Format, other.Format) && Equals(FontDefinition, other.FontDefinition) && BorderDefinition == other.BorderDefinition && FillColor.Equals(other.FillColor);
+            return string.Equals(Format, other.Format) && Equals(Font, other.Font) && Border == other.Border && FillColor.Equals(other.FillColor);
         }
 
         public override bool Equals(object obj)
@@ -55,7 +55,7 @@ namespace JumboExcel.Styling
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != GetType()) return false;
-            return Equals((CellStyleDefinition) obj);
+            return Equals((CellStyle) obj);
         }
 
         public override int GetHashCode()
@@ -63,8 +63,8 @@ namespace JumboExcel.Styling
             unchecked
             {
                 var hashCode = (Format != null ? Format.GetHashCode() : 0);
-                hashCode = (hashCode*397) ^ (FontDefinition != null ? FontDefinition.GetHashCode() : 0);
-                hashCode = (hashCode*397) ^ (int) BorderDefinition;
+                hashCode = (hashCode*397) ^ (Font != null ? Font.GetHashCode() : 0);
+                hashCode = (hashCode*397) ^ (int) Border;
                 hashCode = (hashCode*397) ^ FillColor.GetHashCode();
                 return hashCode;
             }
@@ -72,7 +72,7 @@ namespace JumboExcel.Styling
 
         public override string ToString()
         {
-            return string.Format("{0}, {1}, {2}, {3}", FontDefinition, BorderDefinition, FillColor, Format);
+            return string.Format("{0}, {1}, {2}, {3}", Font, Border, FillColor, Format);
         }
     }
 }

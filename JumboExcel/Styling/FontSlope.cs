@@ -5,7 +5,7 @@ namespace JumboExcel.Styling
     /// </summary>
     public enum FontSlope
     {
-        Normal,
-        Italic
+        NORMAL,
+        ITALIC
     }
 }

@@ -5,7 +5,7 @@ namespace JumboExcel.Styling
     /// </summary>
     public enum FontWeight
     {
-        Normal,
-        Bold
+        NORMAL,
+        BOLD
     }
 }

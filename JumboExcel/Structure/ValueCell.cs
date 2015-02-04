@@ -28,14 +28,14 @@ namespace JumboExcel.Structure
         /// <summary>
         /// Style.
         /// </summary>
-        public NumberStyleDefinition Style { get; private set; }
+        public NumberStyle Style { get; private set; }
 
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="number">Number.</param>
         /// <param name="style">Style.</param>
-        protected NumberCell(TData? number, NumberStyleDefinition style) : base(number)
+        protected NumberCell(TData? number, NumberStyle style) : base(number)
         {
             Style = style;
         }

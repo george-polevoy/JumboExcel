@@ -5,17 +5,17 @@ namespace JumboExcel
     /// <summary>
     /// Visitor interface for hierarchical structure of <see cref="DocumentElement"/>.
     /// </summary>
-    public interface IElementVisitor
+    internal interface IElementVisitor
     {
-        void Visit(WorksheetElement worksheetElement);
-        void Visit(RowElement rowElement);
-        void Visit(RowGroupElement rowGroupElement);
+        void Visit(Worksheet worksheet);
+        void Visit(Row row);
+        void Visit(RowGroup rowGroup);
         void VisitEmptyCell();
-        void Visit(IntegerCellElement integerCellElement);
-        void Visit(DecimalCellElement decimalCellElement);
-        void Visit(DateTimeCellElement dateTimeCellElement);
-        void Visit(InlineStringElement inlineStringElement);
-        void Visit(SharedStringElement sharedStringElement);
-        void Visit(BooleanCellElement booleanCellElement);
+        void Visit(IntegerCell integerCell);
+        void Visit(DecimalCell decimalCell);
+        void Visit(DateTimeCell dateTimeCell);
+        void Visit(InlineString inlineString);
+        void Visit(SharedString sharedString);
+        void Visit(BooleanCell booleanCell);
     }
 }

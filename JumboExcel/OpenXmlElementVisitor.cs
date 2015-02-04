@@ -5,8 +5,12 @@ using System.Linq;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Spreadsheet;
 using JumboExcel.Formatting;
-using JumboExcel.Structure;
 using JumboExcel.Styling;
+using JumboExcel.Structure;
+using Border = JumboExcel.Styling.Border;
+using InlineString = JumboExcel.Structure.InlineString;
+using Row = JumboExcel.Structure.Row;
+using Worksheet = JumboExcel.Structure.Worksheet;
 
 namespace JumboExcel
 {
@@ -21,7 +25,7 @@ namespace JumboExcel
         private readonly OpenXmlWriter writer;
 
         /// <summary>
-        /// Collection of shared strings. Accumulates strings provided in <see cref="SharedStringElement"/> instances.
+        /// Collection of shared strings. Accumulates strings provided in <see cref="SharedString"/> instances.
         /// </summary>
         private readonly SharedElementCollection<string> sharedStringCollection;
 
@@ -68,7 +72,7 @@ namespace JumboExcel
         /// <summary>
         /// Reusable component instance.
         /// </summary>
-        private readonly InlineString sharedSampleInlineString = new InlineString();
+        private readonly DocumentFormat.OpenXml.Spreadsheet.InlineString sharedSampleInlineString = new DocumentFormat.OpenXml.Spreadsheet.InlineString();
 
         /// <summary>
         /// Reusable component instance.
@@ -76,12 +80,12 @@ namespace JumboExcel
         private readonly Text sharedSampleText = new Text();
 
         /// <summary>
-        /// Collection of reusable component instances for wrtiting nested <see cref="RowGroupElement"/> elements.
+        /// Collection of reusable component instances for wrtiting nested <see cref="RowGroup"/> elements.
         /// </summary>
-        private readonly List<Row> sampleRowOulineLevels = new List<Row> {new Row()};
+        private readonly List<DocumentFormat.OpenXml.Spreadsheet.Row> sampleRowOulineLevels = new List<DocumentFormat.OpenXml.Spreadsheet.Row> {new DocumentFormat.OpenXml.Spreadsheet.Row()};
 
         /// <summary>
-        /// Current outline level for row grouping for writing nested <see cref="RowGroupElement"/> elements.
+        /// Current outline level for row grouping for writing nested <see cref="RowGroup"/> elements.
         /// </summary>
         private int outlineLevel;
 
@@ -92,7 +96,7 @@ namespace JumboExcel
         {
             get
             {
-                return sharedSampleSharedStringCell ?? (sharedSampleSharedStringCell = cellStyleDefinitions.AllocateSharedStringCell(new StringStyleDefinition(null, BorderDefinition.None, null), CellValues.SharedString));
+                return sharedSampleSharedStringCell ?? (sharedSampleSharedStringCell = cellStyleDefinitions.AllocateSharedStringCell(new StringStyle(null, Border.NONE, null), CellValues.SharedString));
             }
         }
 
@@ -103,7 +107,7 @@ namespace JumboExcel
         {
             get
             {
-                return sharedSampleDateTimeCell ?? (sharedSampleDateTimeCell = cellStyleDefinitions.AllocateDateCell(new DateStyleDefinition(DateTimeFormat.DateMmDdYy, null, BorderDefinition.None, null), CellValues.Number));
+                return sharedSampleDateTimeCell ?? (sharedSampleDateTimeCell = cellStyleDefinitions.AllocateDateCell(new DateStyle(DateTimeFormat.DateMmDdYy, null, Border.NONE, null), CellValues.Number));
             }
         }
 
@@ -114,7 +118,7 @@ namespace JumboExcel
         {
             get
             {
-                return sharedSampleInlineStringCell ?? (sharedSampleInlineStringCell = cellStyleDefinitions.AllocateStringCell(new StringStyleDefinition(null, BorderDefinition.None, null), CellValues.InlineString));
+                return sharedSampleInlineStringCell ?? (sharedSampleInlineStringCell = cellStyleDefinitions.AllocateStringCell(new StringStyle(null, Border.NONE, null), CellValues.InlineString));
             }
         }
 
@@ -131,11 +135,41 @@ namespace JumboExcel
             this.cellStyleDefinitions = cellStyleDefinitions;
         }
 
-        public void Visit(WorksheetElement worksheetElement)
+        public IEnumerable<TProgress> VisitProgressingWorksheet<TProgress>(params ProgressingWorksheet<TProgress>[] args)
         {
-            using (new WriterScope(writer, new Worksheet()))
+            foreach (var worksheet in args)
             {
-                var worksheetParametersElement = worksheetElement.Parameters;
+                using (new WriterScope(writer, new DocumentFormat.OpenXml.Spreadsheet.Worksheet()))
+                {
+                    var worksheetParametersElement = worksheet.Parameters;
+                    if (worksheetParametersElement != null)
+                    {
+                        WriteWorksheetParameters(worksheetParametersElement);
+                    }
+                    using (new WriterScope(writer, new SheetData()))
+                    {
+                        var rowIndex = 0;
+                        foreach (var p in worksheet.RowGenerator(rows =>
+                        {
+                            foreach (var rowLevelElement in rows)
+                            {
+                                rowLevelElement.Accept(this);
+                                rowIndex++;
+                            }
+                        }))
+                        {
+                            yield return p;
+                        }
+                    }
+                }
+            }
+        }
+
+        public void Visit(Worksheet worksheet)
+        {
+            using (new WriterScope(writer, new DocumentFormat.OpenXml.Spreadsheet.Worksheet()))
+            {
+                var worksheetParametersElement = worksheet.Parameters;
                 if (worksheetParametersElement != null)
                 {
                     WriteWorksheetParameters(worksheetParametersElement);
@@ -144,7 +178,7 @@ namespace JumboExcel
                 using (new WriterScope(writer, new SheetData()))
                 {
                     var rowIndex = 0;
-                    foreach (var rowElement in worksheetElement.RowsLevelElements)
+                    foreach (var rowElement in worksheet.RowsLevelElements)
                     {
                         rowElement.Accept(this);
                         rowIndex++;
@@ -160,42 +194,54 @@ namespace JumboExcel
                 OutlineProperties = new OutlineProperties {SummaryBelow = worksheetParametersElement.Belo, SummaryRight = worksheetParametersElement.Right}
             });
 
-            if (worksheetParametersElement.ColumnElements != null)
+            if (worksheetParametersElement.ColumnConfigurations != null)
             {
                 writer.WriteElement(
-                    new Columns(worksheetParametersElement.ColumnElements.Select(c => new Column {CustomWidth = true, Min = (uint) (c.Min + 1), Max = (uint) (c.Max + 1), Width = (double) c.Width})));
+                    new Columns(worksheetParametersElement.ColumnConfigurations.Select(c => new Column {CustomWidth = true, Min = (uint) (c.Min + 1), Max = (uint) (c.Max + 1), Width = (double) c.Width})));
             }
         }
 
-        public void Visit(RowElement rowElement)
+        bool lastRowLevelElementIsSimpleRow = false;
+
+        public void Visit(Row rowElement)
         {
             var row = sampleRowOulineLevels[outlineLevel];
             using (new WriterScope(writer, row))
             {
                 var columnIndex = 0;
-                foreach (var cellElement in rowElement.CellElements)
+                foreach (var cellElement in rowElement.Cells)
                 {
                     cellElement.Accept(this);
                     columnIndex++;
                 }
             }
+            lastRowLevelElementIsSimpleRow = true;
         }
 
-        public void Visit(RowGroupElement rowGroupElement)
+        public void Visit(RowGroup rowGroup)
         {
+            if (!lastRowLevelElementIsSimpleRow)
+                throw new InvalidOperationException("Row group must follow a simple row element at the outline level.");
             if (outlineLevel >= 255)
                 throw new InvalidOperationException("Row ouline level overflow. Max row grouping level is 255.");
             
             outlineLevel ++;
-            foreach (var rowElement in rowGroupElement.RowElements)
+            var groupChildCount = 0;
+            foreach (var rowElement in rowGroup.RowElements)
             {
                 if (sampleRowOulineLevels.Count < outlineLevel + 1)
                 {
-                    var sampleRow = new Row { OutlineLevel = (byte)outlineLevel};
+                    var sampleRow = new DocumentFormat.OpenXml.Spreadsheet.Row { OutlineLevel = (byte)outlineLevel};
                     sampleRowOulineLevels.Add(sampleRow);
                 }
                 rowElement.Accept(this);
+                groupChildCount ++;
             }
+
+            if (groupChildCount < 1)
+                throw new InvalidOperationException("Empty group detected.");
+
+            lastRowLevelElementIsSimpleRow = false;
             outlineLevel--;
         }
 
@@ -206,69 +252,69 @@ namespace JumboExcel
             }
         }
 
-        public void Visit(IntegerCellElement integerCellElement)
+        public void Visit(IntegerCell integerCell)
         {
-            var sampleCell = integerCellElement.Style.CellStyleDefinition == null ? sharedSampleNumberCell : cellStyleDefinitions.AllocateNumberCell(integerCellElement.Style, CellValues.Number);
+            var sampleCell = integerCell.Style.cellStyle == null ? sharedSampleNumberCell : cellStyleDefinitions.AllocateNumberCell(integerCell.Style, CellValues.Number);
             using (new WriterScope(writer, sampleCell))
             using (new WriterScope(writer, sharedSampleCellValue))
             {
-                if (integerCellElement.Value != null)
-                    writer.WriteString(integerCellElement.Value.ToString());
+                if (integerCell.Value != null)
+                    writer.WriteString(integerCell.Value.ToString());
             }
         }
         
-        public void Visit(DecimalCellElement decimalCellElement)
+        public void Visit(DecimalCell decimalCell)
         {
-            var sampleCell = decimalCellElement.Style.CellStyleDefinition == null ? sharedSampleNumberCell : cellStyleDefinitions.AllocateNumberCell(decimalCellElement.Style, CellValues.Number);
+            var sampleCell = decimalCell.Style.cellStyle == null ? sharedSampleNumberCell : cellStyleDefinitions.AllocateNumberCell(decimalCell.Style, CellValues.Number);
             using (new WriterScope(writer, sampleCell))
             using (new WriterScope(writer, sharedSampleCellValue))
             {
-                if (decimalCellElement.Value.HasValue)
-                    writer.WriteString(decimalCellElement.Value.Value.ToString(CultureInfo.InvariantCulture));
+                if (decimalCell.Value.HasValue)
+                    writer.WriteString(decimalCell.Value.Value.ToString(CultureInfo.InvariantCulture));
             }
         }
 
-        public void Visit(DateTimeCellElement dateTimeCellElement)
+        public void Visit(DateTimeCell dateTimeCell)
         {
-            var sampleCell = dateTimeCellElement.Style.CellStyleDefinition == null ? SharedSampleDateTimeCell : cellStyleDefinitions.AllocateDateCell(dateTimeCellElement.Style, CellValues.Number);
+            var sampleCell = dateTimeCell.Style.cellStyle == null ? SharedSampleDateTimeCell : cellStyleDefinitions.AllocateDateCell(dateTimeCell.Style, CellValues.Number);
             using (new WriterScope(writer, sampleCell))
             using (new WriterScope(writer, sharedSampleCellValue))
             {
-                if (dateTimeCellElement.Value.HasValue)
-                    writer.WriteString(dateTimeCellElement.Value.Value.ToOADate().ToString(CultureInfo.InvariantCulture));
+                if (dateTimeCell.Value.HasValue)
+                    writer.WriteString(dateTimeCell.Value.Value.ToOADate().ToString(CultureInfo.InvariantCulture));
             }
         }
 
-        public void Visit(InlineStringElement inlineStringElement)
+        public void Visit(InlineString inlineString)
         {
-            var sampleCell = inlineStringElement.Style.CellStyleDefinition == null ? SharedSampleInlineStringCell : cellStyleDefinitions.AllocateStringCell(inlineStringElement.Style, CellValues.InlineString);
+            var sampleCell = inlineString.Style.cellStyle == null ? SharedSampleInlineStringCell : cellStyleDefinitions.AllocateStringCell(inlineString.Style, CellValues.InlineString);
             using (new WriterScope(writer, sampleCell))
             using (new WriterScope(writer, sharedSampleInlineString))
             using (new WriterScope(writer, sharedSampleText))
             {
-                writer.WriteString(inlineStringElement.Value);
+                writer.WriteString(inlineString.Value);
             }
         }
 
-        public void Visit(SharedStringElement sharedStringElement)
+        public void Visit(SharedString sharedString)
         {
-            var sampleCell = sharedStringElement.Style.CellStyleDefinition == null ? SharedSampleSharedStringCell : cellStyleDefinitions.AllocateSharedStringCell(sharedStringElement.Style, CellValues.SharedString);
+            var sampleCell = sharedString.Style.cellStyle == null ? SharedSampleSharedStringCell : cellStyleDefinitions.AllocateSharedStringCell(sharedString.Style, CellValues.SharedString);
             using (new WriterScope(writer, sampleCell))
             using (new WriterScope(writer, sharedSampleCellValue))
             {
-                if (sharedStringElement.Value != null)
-                    writer.WriteString(sharedStringCollection.GetOrAllocateElement(sharedStringElement.Value).ToString());
+                if (sharedString.Value != null)
+                    writer.WriteString(sharedStringCollection.GetOrAllocateElement(sharedString.Value).ToString());
             }
         }
 
-        public void Visit(BooleanCellElement booleanCellElement)
+        public void Visit(BooleanCell booleanCell)
         {
-            var sampleCell = booleanCellElement.Style.CellStyleDefinition == null ? sharedSampleBooleanCell : cellStyleDefinitions.AllocateBooleanCell(booleanCellElement.Style, CellValues.Boolean);
+            var sampleCell = booleanCell.Style.cellStyle == null ? sharedSampleBooleanCell : cellStyleDefinitions.AllocateBooleanCell(booleanCell.Style, CellValues.Boolean);
             using (new WriterScope(writer, sampleCell))
             using (new WriterScope(writer, sharedSampleCellValue))
             {
-                if (booleanCellElement.Value.HasValue)
-                    writer.WriteString(booleanCellElement.Value.Value ? "1" : "0");
+                if (booleanCell.Value.HasValue)
+                    writer.WriteString(booleanCell.Value.Value ? "1" : "0");
             }
         }
     }

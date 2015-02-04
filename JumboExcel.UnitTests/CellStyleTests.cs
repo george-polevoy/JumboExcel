@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Linq;
 using JumboExcel.Styling;
 using NUnit.Framework;
+using Font = JumboExcel.Styling.Font;
 
 namespace JumboExcel
 {
@@ -12,11 +13,11 @@ namespace JumboExcel
         public void InequalityOfDifferentTypes()
         {
             var a =
-                new StringStyleDefinition(
-                    new FontDefinition("arial", 11, Color.White, FontSlope.Normal, FontWeight.Normal), BorderDefinition.None,
+                new StringStyle(
+                    new Font("arial", 11, Color.White, FontSlope.NORMAL, FontWeight.NORMAL), Border.NONE,
                     null);
-            var b = new NumberStyleDefinition(null,
-                new FontDefinition("arial", 11, Color.White, FontSlope.Normal, FontWeight.Normal), BorderDefinition.None,
+            var b = new NumberStyle(null,
+                new Font("arial", 11, Color.White, FontSlope.NORMAL, FontWeight.NORMAL), Border.NONE,
                 null);
 
             Assert.AreNotEqual(a,b);
@@ -29,12 +30,12 @@ namespace JumboExcel
                 from typeface in new[] {null, "Arial", "Calibri"}
                 from size in new[] {11m, 16m}
                 from color in new[] {Color.Black, Color.White}
-                from fontSlope in new[] {FontSlope.Normal, FontSlope.Italic}
-                from fontWeight in new[] {FontWeight.Normal, FontWeight.Bold}
-                from border in new[] {BorderDefinition.None, BorderDefinition.All}
+                from fontSlope in new[] {FontSlope.NORMAL, FontSlope.ITALIC}
+                from fontWeight in new[] {FontWeight.NORMAL, FontWeight.BOLD}
+                from border in new[] {Border.NONE, Border.ALL}
                 from fillColor in new Color?[] {null, Color.Bisque, Color.Azure}
                 from format in new[] { null, "0"}
-                select new CellStyleDefinition(new FontDefinition(typeface, size, color, fontSlope, fontWeight), border, fillColor, format);
+                select new CellStyle(new Font(typeface, size, color, fontSlope, fontWeight), border, fillColor, format);
 
             var items = q.ToArray();
 

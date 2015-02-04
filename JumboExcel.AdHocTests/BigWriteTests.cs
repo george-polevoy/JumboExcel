@@ -6,51 +6,95 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using JumboExcel.Formatting;
-using JumboExcel.Structure;
 using JumboExcel.Styling;
+using JumboExcel.Structure;
 using NUnit.Framework;
+using Font = JumboExcel.Styling.Font;
 
 namespace JumboExcel
 {
     class BigWriteTests
     {
         [Test, Explicit]
+        public void TestSimplestReport()
+        {
+            var tempFileName = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".xlsx");
+            using (var file = new FileStream(tempFileName, FileMode.CreateNew))
+            {
+                OpenXmlBuilder.Write(file, new[] { new Worksheet("Report", new WorksheetParametersElement(), new Row(new SharedString("Hello"))) });
+            }
+            Process.Start(tempFileName);
+        }
+
+        [Test, Explicit]
+        public void WriteWithProgress()
+        {
+            var progressingWorksheets = new[] { new ProgressingWorksheet<int>("Progressing", new WorksheetParametersElement(), GenerateRows) };
+
+            var fileName = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".xlsx");
+            using (var outputStream = new FileStream(fileName, FileMode.CreateNew))
+            {
+                foreach (var iteration in OpenXmlBuilder.WriteWithProgress(outputStream, progressingWorksheets))
+                {
+                    Console.WriteLine("Progress: {0}", iteration);
+                }
+            }
+            var fileSize = new FileInfo(fileName).Length;
+            Console.WriteLine("Size of the file generated: {0}", fileSize);
+            Console.WriteLine(fileName);
+
+            Process.Start(fileName);
+        }
+
+        private IEnumerable<int> GenerateRows(Action<IEnumerable<RowLevelElement>> writeElements)
+        {
+            yield return 0;
+
+            writeElements(new[] { new Row(new IntegerCell(1)) });
+
+            yield return 50;
+
+            writeElements(new[] { new Row(new IntegerCell(2)) });
+
+            yield return 100;
+        }
+
+        [Test, Explicit]
         public void Styles()
         {
-            var mediumColumns = new WorksheetParametersElement(false, false, Enumerable.Range(0, 20).Select(column => new ColumnElement(column, column, 30)));
-            var columnsForFonts = new WorksheetParametersElement(false, false, new ColumnElement(0, 0, 50), new ColumnElement(1, 1, 120));
+            var mediumColumns = new WorksheetParametersElement(false, false, Enumerable.Range(0, 20).Select(column => new ColumnConfiguration(column, column, 30)));
+            var columnsForFonts = new WorksheetParametersElement(false, false, new ColumnConfiguration(0, 0, 50), new ColumnConfiguration(1, 1, 120));
 
             WriteAndExecuteExcel(new[]
             {
-                new WorksheetElement("Data Types", mediumColumns, GetDataTypeRows()),
-                new WorksheetElement("Nullable data types styling.", mediumColumns, GetRowsForNullValues()),
-                new WorksheetElement("Row Groupings", mediumColumns,
-                    new RowElement(new SharedStringElement("Level 0")),
-                    new RowGroupElement(
-                        new RowElement(new SharedStringElement("Level 1")),
-                        new RowGroupElement(
-                            new RowElement(new SharedStringElement("Level 2"))),
-                        new RowElement(new SharedStringElement("Level 1"))),
-                    new RowElement(new SharedStringElement("Level 0")),
-                    new RowGroupElement(
-                        new RowElement(new SharedStringElement("Level 1")),
-                        new RowElement(new SharedStringElement("Level 1")))),
-                new WorksheetElement("Fonts", columnsForFonts, GetFontsRows()),
-                new WorksheetElement("Colors", mediumColumns, GetColorRows()),
-                new WorksheetElement("Border Styling", mediumColumns, GetBorderStylingRows()),
-                new WorksheetElement("Column Widths", new WorksheetParametersElement(false, false, new ColumnElement(0, 1, 20), new ColumnElement(2,2, 60)),
-                    new RowElement(
-                        new SharedStringElement("Narrow"),
-                        new SharedStringElement("Narrow"),
-                        new SharedStringElement("Wide"),
-                        new SharedStringElement("Unspec."),
-                        new SharedStringElement("Messed.")),
-                    new RowElement(
-                        new SharedStringElement("Narrow column"),
-                        new SharedStringElement("Another narrow"),
-                        new SharedStringElement("This is a wide column, which displays just perfect."),
-                        new SharedStringElement("This is a wide column, which has unspecified width."),
-                        new SharedStringElement("This value messes with the previous.")))
+                new Worksheet("Data Types", mediumColumns, GetDataTypeRows()),
+                new Worksheet("Nullable data types styling.", mediumColumns, GetRowsForNullValues()),
+                new Worksheet("Row Groupings", mediumColumns,
+                    new Row(new SharedString("Level 1")),
+                    new RowGroup(
+                        new Row(new SharedString("Level 2")),
+                        new RowGroup(
+                            new Row(new SharedString("Level 3"))),
+                        new Row(new SharedString("Level 2")),
+                        new RowGroup(
+                            new Row(new SharedString("Level 3"))))
+                    ),
+                new Worksheet("Fonts", columnsForFonts, GetFontsRows()),
+                new Worksheet("Colors", mediumColumns, GetColorRows()),
+                new Worksheet("Border Styling", mediumColumns, GetBorderStylingRows()),
+                new Worksheet("Column Widths", new WorksheetParametersElement(false, false, new ColumnConfiguration(0, 1, 20), new ColumnConfiguration(2,2, 60)),
+                    new Row(
+                        new SharedString("Narrow"),
+                        new SharedString("Narrow"),
+                        new SharedString("Wide"),
+                        new SharedString("Unspec."),
+                        new SharedString("Messed.")),
+                    new Row(
+                        new SharedString("Narrow column"),
+                        new SharedString("Another narrow"),
+                        new SharedString("This is a wide column, which displays just perfect."),
+                        new SharedString("This is a wide column, which has unspecified width."),
+                        new SharedString("This value messes with the previous.")))
             });
         }
 
@@ -59,15 +103,15 @@ namespace JumboExcel
         [TestCase(1000000, 1)]
         public void ReallyHuge(int rowCount, int columnCount)
         {
-            WriteAndExecuteExcel(Enumerable.Range(0, 1).Select(sheet => new WorksheetElement("Sheet  " + sheet, new WorksheetParametersElement(), Enumerable.Range(0, rowCount).Select(row => new RowElement(
-                new[] { new SharedStringElement("Row mod 10: " + row % 10) }
+            WriteAndExecuteExcel(Enumerable.Range(0, 1).Select(sheet => new Worksheet("Sheet  " + sheet, new WorksheetParametersElement(), Enumerable.Range(0, rowCount).Select(row => new Row(
+                new[] { new SharedString("Row mod 10: " + row % 10) }
                     .Concat(Enumerable.Range(0, columnCount).SelectMany(column => new CellElement[]
                     {
-                        new SharedStringElement("Column: " + column),
-                        EmptyCellElement.Instance,
-                        new IntegerCellElement(row*column + sheet),
-                        new DecimalCellElement((decimal) column/columnCount),
-                        new InlineStringElement("Row: " + row*column),
+                        new SharedString("Column: " + column),
+                        EmptyCell.Instance,
+                        new IntegerCell(row*column + sheet),
+                        new DecimalCell((decimal) column/columnCount),
+                        new InlineString("Row: " + row*column),
                     })))))));
         }
 
@@ -80,113 +124,113 @@ namespace JumboExcel
         [TestCase(2, 1000000, 5)]
         public void PerformanceTest(int sheetCount, int rowCount, int columnCount)
         {
-            var file = WriteFile(Enumerable.Range(0, sheetCount).Select(sheet => new WorksheetElement("Sheet  " + sheet, new WorksheetParametersElement(), Enumerable.Range(0, rowCount).Select(row => new RowElement(
-                Enumerable.Range(0, columnCount).Select(column => new IntegerCellElement(row * column + sheet)))))));
+            var file = WriteFile(Enumerable.Range(0, sheetCount).Select(sheet => new Worksheet("Sheet  " + sheet, new WorksheetParametersElement(), Enumerable.Range(0, rowCount).Select(row => new Row(
+                Enumerable.Range(0, columnCount).Select(column => new IntegerCell(row * column + sheet)))))));
             File.Delete(file);
         }
 
-        private IEnumerable<RowElement> GetRowsForNullValues()
+        private IEnumerable<Row> GetRowsForNullValues()
         {
-            var headerStyle = new StringStyleDefinition(new FontDefinition("Arial", 16, Color.White, FontSlope.Normal, FontWeight.Bold), BorderDefinition.All, Color.Teal);
-            yield return new RowElement(new SharedStringElement("Value Type", headerStyle), new SharedStringElement("Missing Value", headerStyle));
+            var headerStyle = new StringStyle(new Font("Arial", 16, Color.White, FontSlope.NORMAL, FontWeight.BOLD), Border.ALL, Color.Teal);
+            yield return new Row(new SharedString("Value Type", headerStyle), new SharedString("Missing Value", headerStyle));
 
-            yield return MissingValueRow(new DecimalCellElement(null));
-            yield return MissingValueRow(new IntegerCellElement(null));
+            yield return MissingValueRow(new DecimalCell(null));
+            yield return MissingValueRow(new IntegerCell(null));
         }
 
-        private static RowElement MissingValueRow(CellElement element)
+        private static Row MissingValueRow(CellElement element)
         {
-            return new RowElement(new SharedStringElement(element.GetType().Name), element);
+            return new Row(new SharedString(element.GetType().Name), element);
         }
 
-        private IEnumerable<RowElement> GetFontsRows()
+        private IEnumerable<Row> GetFontsRows()
         {
             return from fontFace in new[] { null, "Calibri", "Times New Roman" }
-                   from weight in new[] { FontWeight.Normal, FontWeight.Bold, }
-                   from slope in new[] { FontSlope.Normal, FontSlope.Italic, }
+                   from weight in new[] { FontWeight.NORMAL, FontWeight.BOLD, }
+                   from slope in new[] { FontSlope.NORMAL, FontSlope.ITALIC, }
                    from size in new[] { 7, 11, 24 }
                    select RowForFont(fontFace, slope, weight, size);
         }
 
-        private IEnumerable<RowElement> GetColorRows()
+        private IEnumerable<Row> GetColorRows()
         {
             return from foregroundColor in new[] { Color.Black, Color.Blue, Color.Brown }
                    from backgroundColor in new Color?[] { null, Color.BlanchedAlmond, Color.DarkSeaGreen, Color.Azure }
                    select RowForColor(foregroundColor, backgroundColor);
         }
 
-        private RowElement RowForColor(Color foregroundColor, Color? backgroundColor, string comment = "")
+        private Row RowForColor(Color foregroundColor, Color? backgroundColor, string comment = "")
         {
-            var fontDefinition = new FontDefinition(null, 11, foregroundColor, FontSlope.Normal, FontWeight.Normal);
-            var style = new StringStyleDefinition(fontDefinition, BorderDefinition.None, backgroundColor);
-            return new RowElement(
-                new InlineStringElement(string.Format("{0} over {1}", foregroundColor.ToString(), backgroundColor == null ? "default" : backgroundColor.ToString())),
-                new SharedStringElement("Quick brown fox jumps over the lazy dog. 12345676890", style), new InlineStringElement(comment));
+            var fontDefinition = new Font(null, 11, foregroundColor, FontSlope.NORMAL, FontWeight.NORMAL);
+            var style = new StringStyle(fontDefinition, Border.NONE, backgroundColor);
+            return new Row(
+                new InlineString(string.Format("{0} over {1}", foregroundColor.ToString(), backgroundColor == null ? "default" : backgroundColor.ToString())),
+                new SharedString("Quick brown fox jumps over the lazy dog. 12345676890", style), new InlineString(comment));
         }
 
-        private RowElement RowForFont(string fontFace, FontSlope slope, FontWeight weight, int size, string comment = "")
+        private Row RowForFont(string fontFace, FontSlope slope, FontWeight weight, int size, string comment = "")
         {
-            var fontDefinition = new FontDefinition(fontFace, size, Color.Black, slope, weight);
-            var style = new StringStyleDefinition(fontDefinition, BorderDefinition.None, null);
-            return new RowElement(
-                new InlineStringElement(fontDefinition.ToString()), new SharedStringElement("Quick brown fox jumps over the lazy dog. 12345676890", style), new InlineStringElement(comment));
+            var fontDefinition = new Font(fontFace, size, Color.Black, slope, weight);
+            var style = new StringStyle(fontDefinition, Border.NONE, null);
+            return new Row(
+                new InlineString(fontDefinition.ToString()), new SharedString("Quick brown fox jumps over the lazy dog. 12345676890", style), new InlineString(comment));
         }
 
-        private static IEnumerable<RowElement> GetDataTypeRows()
+        private static IEnumerable<Row> GetDataTypeRows()
         {
-            yield return RowForType(new InlineStringElement("It's a string."));
-            yield return RowForType(new InlineStringElement(null), "With a null value.");
-            yield return RowForType(new SharedStringElement("It's a shared string."));
-            yield return RowForType(new SharedStringElement(null), "With a null value.");
-            yield return RowForType(new SharedStringElement("123"), "Shared string, with a number-like value. Will produce a warning.");
-            yield return RowForType(new InlineStringElement("123"), "Inline string, with a number-like value. Will produce a warning.");
-            var rur = new NumberStyleDefinition(NumberFormat.FromFormatString("#,#0.00\"\u20BD\""), null, BorderDefinition.None, null);
-            var usd = new NumberStyleDefinition(NumberFormat.FromFormatString("\"$\"#,#0.00"), null, BorderDefinition.None, null);
-            var conditional = new NumberStyleDefinition(NumberFormat.FromFormatString("\"positive\"* [Green]#,##0.00;\"negative\"* [Red]-#,##0.00;\"zero\"* [Blue]#,##0.00"), null, BorderDefinition.None, null);
-            yield return RowForType(new DecimalCellElement(123456.7890123m, rur), "Russian roubles.");
-            yield return RowForType(new DecimalCellElement(123456.7890123m / 68m, usd), "US dollars.");
-            yield return RowForType(new DecimalCellElement(123456.7890123m, conditional), "Conditional colored.");
-            yield return RowForType(new DecimalCellElement(0m, conditional), "Conditional colored.");
-            yield return RowForType(new DecimalCellElement(-123456.7890123m, conditional), "Conditional colored.");
-            yield return RowForType(new IntegerCellElement(100L), "new IntegerCellElement(100L)");
-            yield return RowForType(new DecimalCellElement(123.123m), "new DecimalCellElement(123.123m)");
-            yield return RowForType(new IntegerCellElement(100000000L, new NumberStyleDefinition(default(NumberFormat), null, BorderDefinition.None)), "default(NumberFormat)");
-            yield return RowForType(new IntegerCellElement(100000000L, new NumberStyleDefinition(NumberFormat.Default, null, BorderDefinition.None)), "NumberFormat.Default");
-            yield return RowForType(new IntegerCellElement(100000000L, new NumberStyleDefinition(IntegerFormat.General, null, BorderDefinition.None)), "IntegerFormat.General");
-            yield return RowForType(new DecimalCellElement(123.456m, new NumberStyleDefinition(default(NumberFormat), null, BorderDefinition.None)), "default(NumberFormat)");
-            yield return RowForType(new DecimalCellElement(123.123m, new NumberStyleDefinition(NumberFormat.Default, null, BorderDefinition.None)), "NumberFormat.Default");
-            yield return RowForType(new DecimalCellElement(123.123m, new NumberStyleDefinition(IntegerFormat.General, null, BorderDefinition.None)), "IntegerFormat.General");
+            yield return RowForType(new InlineString("It's a string."));
+            yield return RowForType(new InlineString(null), "With a null value.");
+            yield return RowForType(new SharedString("It's a shared string."));
+            yield return RowForType(new SharedString(null), "With a null value.");
+            yield return RowForType(new SharedString("123"), "Shared string, with a number-like value. Will produce a warning.");
+            yield return RowForType(new InlineString("123"), "Inline string, with a number-like value. Will produce a warning.");
+            var rur = new NumberStyle(NumberFormat.FromFormatString("#,#0.00\"\u20BD\""), null, Border.NONE, null);
+            var usd = new NumberStyle(NumberFormat.FromFormatString("\"$\"#,#0.00"), null, Border.NONE, null);
+            var conditional = new NumberStyle(NumberFormat.FromFormatString("\"positive\"* [Green]#,##0.00;\"negative\"* [Red]-#,##0.00;\"zero\"* [Blue]#,##0.00"), null, Border.NONE, null);
+            yield return RowForType(new DecimalCell(123456.7890123m, rur), "Russian roubles.");
+            yield return RowForType(new DecimalCell(123456.7890123m / 68m, usd), "US dollars.");
+            yield return RowForType(new DecimalCell(123456.7890123m, conditional), "Conditional colored.");
+            yield return RowForType(new DecimalCell(0m, conditional), "Conditional colored.");
+            yield return RowForType(new DecimalCell(-123456.7890123m, conditional), "Conditional colored.");
+            yield return RowForType(new IntegerCell(100L), "new IntegerCellElement(100L)");
+            yield return RowForType(new DecimalCell(123.123m), "new DecimalCellElement(123.123m)");
+            yield return RowForType(new IntegerCell(100000000L, new NumberStyle(default(NumberFormat), null, Border.NONE)), "default(NumberFormat)");
+            yield return RowForType(new IntegerCell(100000000L, new NumberStyle(NumberFormat.Default, null, Border.NONE)), "NumberFormat.Default");
+            yield return RowForType(new IntegerCell(100000000L, new NumberStyle(IntegerFormat.General, null, Border.NONE)), "IntegerFormat.General");
+            yield return RowForType(new DecimalCell(123.456m, new NumberStyle(default(NumberFormat), null, Border.NONE)), "default(NumberFormat)");
+            yield return RowForType(new DecimalCell(123.123m, new NumberStyle(NumberFormat.Default, null, Border.NONE)), "NumberFormat.Default");
+            yield return RowForType(new DecimalCell(123.123m, new NumberStyle(IntegerFormat.General, null, Border.NONE)), "IntegerFormat.General");
             foreach (var format in IntegerFormat.GetIntegerFormats())
             {
-                var numberStyleDefinition = new NumberStyleDefinition(format, null, BorderDefinition.None, null);
+                var numberStyleDefinition = new NumberStyle(format, null, Border.NONE, null);
                 foreach (var value in new long[] {-123456, -123, 0, 123, 123456})
                 {
-                    yield return RowForType(new IntegerCellElement(value, numberStyleDefinition), GetValueFormatComment(format, value.ToString(CultureInfo.InvariantCulture)));
-                    yield return RowForType(new IntegerCellElement(value), GetNoStyleComment(value.ToString(CultureInfo.InvariantCulture)));
+                    yield return RowForType(new IntegerCell(value, numberStyleDefinition), GetValueFormatComment(format, value.ToString(CultureInfo.InvariantCulture)));
+                    yield return RowForType(new IntegerCell(value), GetNoStyleComment(value.ToString(CultureInfo.InvariantCulture)));
                 }
             }
             foreach (var format in DecimalFormat.GetDecimalFormats())
             {
-                var numberStyleDefinition = new NumberStyleDefinition(format, null, BorderDefinition.None, null);
+                var numberStyleDefinition = new NumberStyle(format, null, Border.NONE, null);
                 foreach (var value in new[] {-123456.123456m, -123, -0.12345m, 0, 0.12345m, 123, 123456.123456m})
                 {
-                    yield return RowForType(new DecimalCellElement(value, numberStyleDefinition), GetValueFormatComment(format, value.ToString(CultureInfo.InvariantCulture)));
-                    yield return RowForType(new DecimalCellElement(value), GetNoStyleComment(value.ToString(CultureInfo.InvariantCulture)));
+                    yield return RowForType(new DecimalCell(value, numberStyleDefinition), GetValueFormatComment(format, value.ToString(CultureInfo.InvariantCulture)));
+                    yield return RowForType(new DecimalCell(value), GetNoStyleComment(value.ToString(CultureInfo.InvariantCulture)));
                 }
             }
             var dateValue = new DateTime(2014, 12, 29, 16, 35, 56).AddMilliseconds(125);
             var customDateFormats = new[] {default(DateTimeFormat), new DateTimeFormat("m/d/yy H:mm:ss")};
             foreach (var format in DateTimeFormat.GetDateTimeFormats().Concat(customDateFormats))
             {
-                yield return RowForType(new DateTimeCellElement(dateValue, new DateStyleDefinition(format, null, BorderDefinition.None, null)), GetValueFormatComment(format, dateValue.ToString("u")));
+                yield return RowForType(new DateTimeCell(dateValue, new DateStyle(format, null, Border.NONE, null)), GetValueFormatComment(format, dateValue.ToString("u")));
             }
 
-            yield return RowForType(new BooleanCellElement(null), "Null boolean without style.");
-            yield return RowForType(new BooleanCellElement(true), "True boolean without style.");
-            yield return RowForType(new BooleanCellElement(false), "False boolean without style.");
-            yield return RowForType(new BooleanCellElement(null, new BooleanStyleDefinition(null, BorderDefinition.None, Color.SkyBlue)), "Null boolean styled.");
-            yield return RowForType(new BooleanCellElement(true, new BooleanStyleDefinition(null, BorderDefinition.None, Color.SkyBlue)), "True boolean styled.");
-            yield return RowForType(new BooleanCellElement(false, new BooleanStyleDefinition(null, BorderDefinition.None, Color.SkyBlue)), "False boolean styled.");
+            yield return RowForType(new BooleanCell(null), "Null boolean without style.");
+            yield return RowForType(new BooleanCell(true), "True boolean without style.");
+            yield return RowForType(new BooleanCell(false), "False boolean without style.");
+            yield return RowForType(new BooleanCell(null, new BooleanStyle(null, Border.NONE, Color.SkyBlue)), "Null boolean styled.");
+            yield return RowForType(new BooleanCell(true, new BooleanStyle(null, Border.NONE, Color.SkyBlue)), "True boolean styled.");
+            yield return RowForType(new BooleanCell(false, new BooleanStyle(null, Border.NONE, Color.SkyBlue)), "False boolean styled.");
         }
 
         private static string GetNoStyleComment(string value)
@@ -199,54 +243,53 @@ namespace JumboExcel
             return string.Format("Format: \"{0}\", value: {1}", numberFormat != null ? numberFormat.FormatCode : null, value);
         }
 
-        private static RowElement RowForType<T>(T element, string comment = "") where T : CellElement
+        private static Row RowForType<T>(T element, string comment = "") where T : CellElement
         {
-            return new RowElement(new InlineStringElement(typeof(T).Name), EmptyCellElement.Instance, element, EmptyCellElement.Instance, new InlineStringElement(comment));
+            return new Row(new InlineString(typeof(T).Name), EmptyCell.Instance, element, EmptyCell.Instance, new InlineString(comment));
         }
 
-        private static IEnumerable<RowElement> GetBorderStylingRows()
+        private static IEnumerable<Row> GetBorderStylingRows()
         {
-            Func<int, BorderDefinition> borderVariant = i =>
-                ((i & 1) != 0 ? BorderDefinition.Left : BorderDefinition.None) |
-                ((i & 1 << 1) != 0 ? BorderDefinition.Right : BorderDefinition.None) |
-                ((i & 1 << 2) != 0 ? BorderDefinition.Top : BorderDefinition.None) |
-                ((i & 1 << 3) != 0 ? BorderDefinition.Bottom : BorderDefinition.None);
+            Func<int, Border> borderVariant = i =>
+                ((i & 1) != 0 ? Border.LEFT : Border.NONE) |
+                ((i & 1 << 1) != 0 ? Border.RIGHT : Border.NONE) |
+                ((i & 1 << 2) != 0 ? Border.TOP : Border.NONE) |
+                ((i & 1 << 3) != 0 ? Border.BOTTOM : Border.NONE);
 
             var borderVariants = Enumerable.Range(0, 16).Select(i => borderVariant(i)).ToArray();
 
-            var borderStylingRows = new List<RowElement> { new RowElement() };
+            var borderStylingRows = new List<Row> { new Row() };
             foreach (var bv in borderVariants)
             {
-                borderStylingRows.Add(new RowElement(EmptyCellElement.Instance,
-                    new InlineStringElement(bv.ToString(), new StringStyleDefinition(null, bv, null))));
+                borderStylingRows.Add(new Row(EmptyCell.Instance,
+                    new InlineString(bv.ToString(), new StringStyle(null, bv, null))));
                 AddEmptyRow(borderStylingRows);
             }
             return borderStylingRows;
         }
 
-        private static void AddEmptyRow(List<RowElement> rows)
+        private static void AddEmptyRow(List<Row> rows)
         {
-            rows.Add(new RowElement(Enumerable.Empty<CellElement>()));
+            rows.Add(new Row(Enumerable.Empty<CellElement>()));
         }
 
-        private static void WriteAndExecuteExcel(IEnumerable<WorksheetElement> worksheetElements)
+        private static void WriteAndExecuteExcel(IEnumerable<Worksheet> worksheetElements)
         {
             var fileName = WriteFile(worksheetElements);
             Process.Start(fileName);
         }
 
-        private static string WriteFile(IEnumerable<WorksheetElement> worksheetElements)
+        private static string WriteFile(IEnumerable<Worksheet> worksheetElements)
         {
             return WriteFileInternal(worksheetElements);
         }
 
-        private static string WriteFileInternal(IEnumerable<WorksheetElement> worksheetElements)
+        private static string WriteFileInternal(IEnumerable<Worksheet> worksheetElements)
         {
             var fileName = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".xlsx");
             using (var outputStream = new FileStream(fileName, FileMode.CreateNew))
             {
-                var builder = new OpenXmlBuilder();
-                builder.Write(
+                OpenXmlBuilder.Write(
                     outputStream,
                     worksheetElements
                     );
