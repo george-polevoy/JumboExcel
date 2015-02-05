@@ -46,7 +46,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BigWriteTests.cs" />
+    <Compile Include="ExploreLimitsTests.cs" />
+    <Compile Include="ProgressingWorksheetTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StyleTests.cs" />
+    <Compile Include="TestHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config">
