@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>$author$</authors>
+    <owners>$author$</owners>
+    <!--<licenseUrl>http://LICENSE_URL_HERE_OR_DELETE_THIS_LINE</licenseUrl>
+    <projectUrl>http://PROJECT_URL_HERE_OR_DELETE_THIS_LINE</projectUrl>
+    <iconUrl>http://ICON_URL_HERE_OR_DELETE_THIS_LINE</iconUrl>-->
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <releaseNotes>Implemented basic Excel export functionality.</releaseNotes>
+    <copyright>Copyright 2015 by George Polevoy.</copyright>
+    <tags>OpenXml Excel Performance GC-Friendly Linq Async SAX DOM</tags>
+    <references>
+      <!--<reference file="DocumentFormat.OpenXml.dll" />-->
+      <reference file="JumboExcel.dll" />
+    </references>
+  </metadata>
+  <files>
+    <file src="..\externals\OpenXml2.5\DocumentFormat.OpenXml.dll" target="lib\net40" />
+  </files>
+</package>
