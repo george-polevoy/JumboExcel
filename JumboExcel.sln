@@ -6,14 +6,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JumboExcel", "JumboExcel\Ju
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JumboExcel.UnitTests", "JumboExcel.UnitTests\JumboExcel.UnitTests.csproj", "{5F924050-D3EF-461B-80CC-7E809A9A989C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JumboExcel.AdHocTests", "JumboExcel.AdHocTests\JumboExcel.AdHocTests.csproj", "{4B0D4B45-6749-4431-B9E3-73816CAE8072}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{E11B7B42-A697-4B5B-BE60-D3A53D25D44C}"
 	ProjectSection(SolutionItems) = preProject
 		.nuget\NuGet.Config = .nuget\NuGet.Config
 		.nuget\NuGet.exe = .nuget\NuGet.exe
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JumboExcel.DemoTests", "JumboExcel.DemoTests\JumboExcel.DemoTests.csproj", "{4B0D4B45-6749-4431-B9E3-73816CAE8072}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

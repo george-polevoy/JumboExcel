@@ -4,12 +4,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("JumboExcel.AdHocTests")]
+[assembly: AssemblyTitle("JumboExcel.DemoTests")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("JumboExcel.AdHocTests")]
-[assembly: AssemblyCopyright("Copyright ©  2014")]
+[assembly: AssemblyProduct("JumboExcel.DemoTests")]
+[assembly: AssemblyCopyright("Copyright © George Polevoy 2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -19,7 +19,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("9395052c-6ad7-499e-a81a-dc1639aedc85")]
+[assembly: Guid("e71398db-6c28-4f52-9041-1bc96fc6057d")]
 
 // Version information for an assembly consists of the following four values:
 //

@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>JumboExcel</RootNamespace>
-    <AssemblyName>JumboExcel.AdHocTests</AssemblyName>
+    <AssemblyName>JumboExcel.DemoTests</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
@@ -59,7 +59,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\JumboExcel\JumboExcel.csproj">
-      <Project>{D299E5D2-15A7-4E5B-AC86-040D33731D7F}</Project>
+      <Project>{d299e5d2-15a7-4e5b-ac86-040d33731d7f}</Project>
       <Name>JumboExcel</Name>
     </ProjectReference>
   </ItemGroup>
