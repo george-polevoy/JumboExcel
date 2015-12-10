@@ -7,7 +7,7 @@ Optimized for heavy-load server environments.
 
 Thread safe, single export operation per thread (progressive version requires external synchronization per document).
 
-Lazy evaluation over an IEnunumberable allows for exporting huge Excel tables (tens of millions of rows) in a server environment without accumulating memory overhead.
+Lazy evaluation over an IEnumerable allows for exporting huge Excel tables (tens of millions of rows) in a server environment without accumulating memory overhead.
 
 Minimalistic API - single line can be used to generate entire Excel table from IEnumerable.
 
