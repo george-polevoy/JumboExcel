@@ -28,4 +28,4 @@ This framework appeared while working on a performance problem, where a client w
 Generating an excel file on server was out of question as nobody ever wanted such a problem to appear in server environment and nobody from the team wanted to deal with possible compatibility problems.
 
 The framework solved the performance problem and allowed to remove the limitations on certain functions, such as exporting more then 100000 rows, or 200000 cells.
-Such tasks are andled by the new framework just instantly so nobody eventhinks of such perf limitations again.
+Such tasks are handled by the new framework just instantly so nobody even thinks of such performance limitations again.
