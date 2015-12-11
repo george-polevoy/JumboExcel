@@ -84,8 +84,24 @@ namespace JumboExcel
                         new SharedString("Another narrow"),
                         new SharedString("This is a wide column, which displays just perfect."),
                         new SharedString("This is a wide column, which has unspecified width."),
-                        new SharedString("This value messes with the previous.")))
+                        new SharedString("This value messes with the previous."))),
+                new Worksheet("Text Rotation", new WorksheetParametersElement(false, false, new ColumnConfiguration(0,0, 20), new ColumnConfiguration(1, 1, 20)),
+                    Enumerable.Range(0, 5).Select(i=>CreateRotatedRow(i * 45))),
+                new Worksheet("Wrap text", new WorksheetParametersElement(false, false),
+                    new Row(new SharedString("This is a wide string that should be wrapped.", CreateWrappedStringStyle()), new SharedString("This is a wide string that should be wrapped.", CreateWrappedStringStyle()), new SharedString("This is a wide string that is not wrapped.")),
+                    new Row(new SharedString("This is a wide string that should not be wrapped."), new SharedString("This is a wide string that should not be wrapped."))
+                    )
             });
+        }
+
+        static StringStyle CreateWrappedStringStyle()
+        {
+            return new StringStyle(null, Border.NONE, null, new Alignment(HorizontalAlignment.LEFT, VerticalAlignment.TOP, 0, true));
+        }
+
+        static Row CreateRotatedRow(int textRotation)
+        {
+            return new Row(new IntegerCell(textRotation), new SharedString("Rotated text", new StringStyle(null, Border.NONE, null, new Alignment(HorizontalAlignment.LEFT, VerticalAlignment.TOP, textRotation))));
         }
 
         private IEnumerable<Row> GetRowsForNullValues()
