@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace JumboExcel.Structure
 {
@@ -12,6 +13,11 @@ namespace JumboExcel.Structure
         /// Column configurations.
         /// </summary>
         public IEnumerable<ColumnConfiguration> ColumnConfigurations { get; private set; }
+
+        /// <summary>
+        /// Frozen panes.
+        /// </summary>
+        public PaneFreezer PaneFreezer { get; private set; }
 
         /// <summary>
         /// Specifies, if the summary rows are belo the grouped rows.
@@ -35,12 +41,14 @@ namespace JumboExcel.Structure
         /// </summary>
         /// <param name="belo">Specifies if the summary rows are belo the grouped rows.</param>
         /// <param name="right">Specifies, if the summary columns are at the right of grouped columns (Grouped collumns are not supported in this implementation).</param>
-        /// <param name="columnConfigurations">Column configurations.</param>
-        public WorksheetParametersElement(bool belo, bool right, IEnumerable<ColumnConfiguration> columnConfigurations = null)
+        /// <param name="columnConfigurations">Column configurations. Can be <code>null</code>.</param>
+        /// <param name="paneFreezer">Frozen panes. Can be <code>null</code>.</param>
+        public WorksheetParametersElement(bool belo, bool right, IEnumerable<ColumnConfiguration> columnConfigurations, PaneFreezer paneFreezer)
         {
             Belo = belo;
             Right = right;
-            ColumnConfigurations = columnConfigurations;
+            ColumnConfigurations = columnConfigurations ?? Enumerable.Empty<ColumnConfiguration>();
+            PaneFreezer = paneFreezer;
         }
 
         /// <summary>
@@ -50,10 +58,8 @@ namespace JumboExcel.Structure
         /// <param name="right">Specifies, if the summary columns are at the right of grouped columns (Grouped collumns are not supported in this implementation).</param>
         /// <param name="columnConfigurations">Column configurations.</param>
         public WorksheetParametersElement(bool belo, bool right, params ColumnConfiguration[] columnConfigurations)
+            : this(belo, right, columnConfigurations, null)
         {
-            Belo = belo;
-            Right = right;
-            ColumnConfigurations = columnConfigurations;
         }
     }
 

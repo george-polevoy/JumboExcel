@@ -22,10 +22,10 @@ namespace JumboExcel
 
         [Test]
         [Explicit]
-        [TestCase(1000000, 1)]
-        public void ReallyHuge(int rowCount, int columnCount)
+        [TestCase(2, 1000000, 3)]
+        public void ReallyHuge(int sheetCount, int rowCount, int columnCount)
         {
-            TestHelper.WriteAndExecuteExcel(Enumerable.Range(0, 1).Select(sheet => new Worksheet("Sheet  " + sheet, new WorksheetParametersElement(), Enumerable.Range(0, rowCount).Select(row => new Row(
+            TestHelper.WriteAndExecuteExcel(Enumerable.Range(0, sheetCount).Select(sheet => new Worksheet("Sheet  " + sheet, new WorksheetParametersElement(), Enumerable.Range(0, rowCount).Select(row => new Row(
                 new[] { new SharedString("Row mod 10: " + row % 10) }
                     .Concat(Enumerable.Range(0, columnCount).SelectMany(column => new CellElement[]
                     {

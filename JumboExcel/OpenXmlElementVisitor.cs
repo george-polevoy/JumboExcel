@@ -244,22 +244,61 @@ namespace JumboExcel
         /// <param name="worksheetParametersElement">Worksheet parameters.</param>
         private void WriteWorksheetParameters(WorksheetParametersElement worksheetParametersElement)
         {
+            // Note that the order of the elements is important.
+            // There are probably more, and to be exactly in the order Excel understands.
+
+            // <sheetPr>
             writer.WriteElement(new SheetProperties
             {
                 OutlineProperties = new OutlineProperties { SummaryBelow = worksheetParametersElement.Belo, SummaryRight = worksheetParametersElement.Right }
             });
 
+            // <dimension>
+            // Not used in this implementation
+
+            var freezer = worksheetParametersElement.PaneFreezer;
+            // <sheetViews>
+            if (freezer != null && (freezer.RowIndex > 0 || freezer.RowIndex > 0))
+            {
+                var pane = new Pane();
+
+                if (freezer.RowIndex > 0)
+                {
+                    pane.VerticalSplit = (double) freezer.RowIndex;
+                }
+
+                if (freezer.ColumnIndex > 0)
+                {
+                    pane.HorizontalSplit = (double) freezer.ColumnIndex;
+                }
+
+                pane.TopLeftCell = ExcelHelper.CellRef(freezer.RowIndex, freezer.ColumnIndex);
+                pane.State = PaneStateValues.Frozen;
+                writer.WriteElement(
+                    new SheetViews(new SheetView(pane)
+                    {
+                        WorkbookViewId = (UInt32Value) (uint) 0
+                    }));
+            }
+
+            // <sheetFormatPr>
+            // Not used in this implementation.
+
+            // <cols>
             if (worksheetParametersElement.ColumnConfigurations != null)
             {
-                writer.WriteElement(
-                    new Columns(worksheetParametersElement.ColumnConfigurations.Select(c => new Column
-                    {
-                        CustomWidth = true,
-                        Min = (uint)(c.Min + 1),
-                        Max = (uint)(c.Max + 1),
-                        Width = (double)c.Width,
-                        OutlineLevel = (byte)c.OutlineLevel
-                    })));
+                var childElements = worksheetParametersElement.ColumnConfigurations.Select(c => new Column
+                {
+                    CustomWidth = true,
+                    Min = (uint)(c.Min + 1),
+                    Max = (uint)(c.Max + 1),
+                    Width = (double)c.Width,
+                    OutlineLevel = (byte)c.OutlineLevel
+                }).ToList();
+
+                if (childElements.Count > 0)
+                    writer.WriteElement(
+                        new Columns(childElements));
             }
         }
 

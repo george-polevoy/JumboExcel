@@ -16,7 +16,7 @@ namespace JumboExcel
         [Test, Explicit]
         public void Styles()
         {
-            var mediumColumns = new WorksheetParametersElement(false, false, Enumerable.Range(0, 20).Select(column => new ColumnConfiguration(column, column, 30)));
+            var mediumColumns = new WorksheetParametersElement(false, false, Enumerable.Range(0, 20).Select(column => new ColumnConfiguration(column, column, 30)), null);
             var columnsForFonts = new WorksheetParametersElement(false, false, new ColumnConfiguration(0, 0, 50), new ColumnConfiguration(1, 1, 120));
 
             var mergedCellStyle = new StringStyle(null, Border.ALL, Color.Beige);
@@ -25,6 +25,7 @@ namespace JumboExcel
             TestHelper.WriteAndExecuteExcel(new[]
             {
                 new Worksheet("Data Types", mediumColumns, GetDataTypeRows()),
+                new Worksheet("Frozen Panes", new WorksheetParametersElement(false, false, null, new PaneFreezer(1, 1)), SampleDataSources.GetMultiplicationTableCells(40, 60).Select(r => new Row(r))),
                 new Worksheet("Nullable data types styling.", mediumColumns, GetRowsForNullValues()),
                 new Worksheet("Row Groupings", mediumColumns,
                     new Row(new SharedString("Level 1")),
