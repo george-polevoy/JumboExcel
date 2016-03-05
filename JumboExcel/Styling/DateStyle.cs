@@ -9,16 +9,16 @@ namespace JumboExcel.Styling
     public struct DateStyle
     {
         /// <summary>
-        /// Shared cell style.
+        /// Style.
         /// </summary>
         internal readonly CellStyle cellStyle;
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        public DateStyle(DateTimeFormat format, Font font, Border border, Color? fillColor = default (Color?))
+        public DateStyle(DateTimeFormat format, Font font, Border border = Border.NONE, Color? fillColor = default (Color?), Alignment alignment = null)
         {
-            cellStyle = new CellStyle(font, border, fillColor, (format ?? DateTimeFormat.DateDMmm).FormatCode);
+            cellStyle = new CellStyle(font, border, fillColor, (format ?? DateTimeFormat.DateDMmm).FormatCode, alignment);
         }
     }
 }

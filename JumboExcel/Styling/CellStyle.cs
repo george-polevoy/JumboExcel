@@ -29,25 +29,39 @@ namespace JumboExcel.Styling
         internal string Format { get; private set; }
 
         /// <summary>
+        /// Alignment of the cell contents.
+        /// </summary>
+        public Alignment Alignment { get; private set; }
+
+        /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="font">Font.</param>
         /// <param name="border">Borders.</param>
         /// <param name="fillColor">Fill color.</param>
         /// <param name="format">Format.</param>
-        internal CellStyle(Font font, Border border, Color? fillColor, string format = null)
+        /// <param name="alignment">Cell alignment.</param>
+        internal CellStyle(Font font, Border border, Color? fillColor = null, string format = null, Alignment alignment = null)
         {
             Font = font;
             Border = border;
             FillColor = fillColor;
             Format = format;
+            Alignment = alignment;
         }
 
         public bool Equals(CellStyle other)
         {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
-            return string.Equals(Format, other.Format) && Equals(Font, other.Font) && Border == other.Border && FillColor.Equals(other.FillColor);
+            if (ReferenceEquals(null, other)) 
+                return false;
+            if (ReferenceEquals(this, other)) 
+                return true;
+            var result = string.Equals(Format, other.Format) && Equals(Font, other.Font) && Border == other.Border && FillColor.Equals(other.FillColor);
+            if (!result)
+                return false;
+            if (Alignment == null)
+                return other.Alignment == null;
+            return Alignment.Equals(other.Alignment);
         }
 
         public override bool Equals(object obj)
@@ -66,6 +80,8 @@ namespace JumboExcel.Styling
                 hashCode = (hashCode*397) ^ (Font != null ? Font.GetHashCode() : 0);
                 hashCode = (hashCode*397) ^ (int) Border;
                 hashCode = (hashCode*397) ^ FillColor.GetHashCode();
+                if (Alignment != null)
+                    hashCode = (hashCode*397) ^ Alignment.GetHashCode();
                 return hashCode;
             }
         }

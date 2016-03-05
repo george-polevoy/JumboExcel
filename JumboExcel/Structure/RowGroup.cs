@@ -13,27 +13,28 @@ namespace JumboExcel.Structure
         private readonly IEnumerable<RowLevelElement> rowElements;
 
         /// <summary>
-        /// Constructor.
+        /// Display elements as collapsed initially.
         /// </summary>
-        /// <param name="rowElements">Child row level elements.</param>
-        public RowGroup(IEnumerable<RowLevelElement> rowElements)
-        {
-            this.rowElements = rowElements;
-        }
+        public bool Collapse { get; private set; }
 
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="rowElements">Child row level elements.</param>
-        public RowGroup(params RowLevelElement[] rowElements)
+        /// <param name="collapse">Show child rows as collapsed initially.</param>
+        public RowGroup(IEnumerable<RowLevelElement> rowElements, bool collapse = false)
         {
+            Collapse = collapse;
             this.rowElements = rowElements;
         }
 
         /// <summary>
         /// Child row level elements.
         /// </summary>
-        public IEnumerable<RowLevelElement> RowElements { get { return rowElements; } }
+        public IEnumerable<RowLevelElement> RowElements
+        {
+            get { return rowElements; }
+        }
 
         internal override void Accept(IElementVisitor visitor)
         {

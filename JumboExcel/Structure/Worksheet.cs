@@ -79,10 +79,8 @@ namespace JumboExcel.Structure
         }
 
         public Worksheet(string name, WorksheetParametersElement parameters, params RowLevelElement[] rowsLevelElements)
+            : this(name, parameters, (IEnumerable<RowLevelElement>)rowsLevelElements)
         {
-            Name = name;
-            Parameters = parameters;
-            RowsLevelElements = rowsLevelElements;
         }
 
         internal override void Accept(IElementVisitor visitor)

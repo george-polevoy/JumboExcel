@@ -80,14 +80,35 @@ namespace JumboExcel
         private readonly Text sharedSampleText = new Text();
 
         /// <summary>
-        /// Collection of reusable component instances for wrtiting nested <see cref="RowGroup"/> elements.
+        /// Current reusable row element.
         /// </summary>
-        private readonly List<DocumentFormat.OpenXml.Spreadsheet.Row> sampleRowOulineLevels = new List<DocumentFormat.OpenXml.Spreadsheet.Row> {new DocumentFormat.OpenXml.Spreadsheet.Row()};
+        DocumentFormat.OpenXml.Spreadsheet.Row currentLevelSampleRow = new DocumentFormat.OpenXml.Spreadsheet.Row();
+
+        /// <summary>
+        /// Collection of reusable elements for nested <see cref="RowGroup"/> elements.
+        /// </summary>
+        private readonly List<RowSlot> sampleRowOulineLevels = new List<RowSlot> { new RowSlot() };
+
+        class RowSlot
+        {
+            public DocumentFormat.OpenXml.Spreadsheet.Row regularRow;
+            public DocumentFormat.OpenXml.Spreadsheet.Row hiddenRow;
+        }
 
         /// <summary>
         /// Current outline level for row grouping for writing nested <see cref="RowGroup"/> elements.
         /// </summary>
         private int outlineLevel;
+
+        /// <summary>
+        /// Current row's zero based index.
+        /// </summary>
+        private int rowIndex;
+
+        /// <summary>
+        /// Current column's zero based index.
+        /// </summary>
+        private int columnIndex;
 
         /// <summary>
         /// Reusable component instance.
@@ -123,6 +144,11 @@ namespace JumboExcel
         }
 
         /// <summary>
+        /// List of the cell merge information entries, aggregated during visitation of the worksheet structure.
+        /// </summary>
+        readonly List<CellMergeInfo> mergedCells = new List<CellMergeInfo>();
+
+        /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="writer">Writer for the worksheet part.</param>
@@ -148,7 +174,7 @@ namespace JumboExcel
                     }
                     using (new WriterScope(writer, new SheetData()))
                     {
-                        var rowIndex = 0;
+                        rowIndex = 0;
                         foreach (var p in worksheet.RowGenerator(rows =>
                         {
                             foreach (var rowLevelElement in rows)
@@ -177,38 +203,77 @@ namespace JumboExcel
 
                 using (new WriterScope(writer, new SheetData()))
                 {
-                    var rowIndex = 0;
                     foreach (var rowElement in worksheet.RowsLevelElements)
                     {
                         rowElement.Accept(this);
-                        rowIndex++;
                     }
+                }
+
+                if (mergedCells.Count > 0)
+                {
+                    WriteMergedCells();
                 }
             }
         }
 
+        /// <summary>
+        /// Writes merged cells information.
+        /// </summary>
+        private void WriteMergedCells()
+        {
+            var ranges = mergedCells.
+                GroupBy(i => i.UpperLeft).
+                Select(g => new { upperLeft = g.Key, lowerRight = new { Row = g.Max(i => i.LowerRight.Row), Column = g.Max(i => i.LowerRight.Column) } }).
+                Where(range => range.upperLeft.Column != range.lowerRight.Column || range.upperLeft.Row != range.lowerRight.Row).ToList();
+
+            if (ranges.Count == 0)
+                return;
+
+            foreach (var badRange in ranges
+                .Where(range => range.upperLeft.Column > range.lowerRight.Column || range.upperLeft.Row > range.lowerRight.Row || range.upperLeft.Column < 0 || range.upperLeft.Row < 0))
+                throw new InvalidOperationException(string.Format("Incompatible range. upperLeft: {0}, lowerRight: {1}", badRange.upperLeft, badRange.lowerRight));
+
+            using (new WriterScope(writer, new MergeCells()))
+                foreach (var rangeSpec in ranges.Select(range => Range(CellRef(range.upperLeft.Row, range.upperLeft.Column), CellRef(range.lowerRight.Row, range.lowerRight.Column))))
+                    writer.WriteElement(new MergeCell { Reference = rangeSpec });
+        }
+
+        /// <summary>
+        /// Writes worksheet parameters.
+        /// </summary>
+        /// <param name="worksheetParametersElement">Worksheet parameters.</param>
         private void WriteWorksheetParameters(WorksheetParametersElement worksheetParametersElement)
         {
             writer.WriteElement(new SheetProperties
             {
-                OutlineProperties = new OutlineProperties {SummaryBelow = worksheetParametersElement.Belo, SummaryRight = worksheetParametersElement.Right}
+                OutlineProperties = new OutlineProperties { SummaryBelow = worksheetParametersElement.Belo, SummaryRight = worksheetParametersElement.Right }
             });
 
             if (worksheetParametersElement.ColumnConfigurations != null)
             {
                 writer.WriteElement(
-                    new Columns(worksheetParametersElement.ColumnConfigurations.Select(c => new Column {CustomWidth = true, Min = (uint) (c.Min + 1), Max = (uint) (c.Max + 1), Width = (double) c.Width})));
+                    new Columns(worksheetParametersElement.ColumnConfigurations.Select(c => new Column
+                    {
+                        CustomWidth = true,
+                        Min = (uint)(c.Min + 1),
+                        Max = (uint)(c.Max + 1),
+                        Width = (double)c.Width,
+                        OutlineLevel = (byte)c.OutlineLevel
+                    })));
             }
         }
 
-        bool lastRowLevelElementIsSimpleRow = false;
+        /// <summary>
+        /// Specified if the last row level element was a simple row (not a row group).
+        /// </summary>
+        bool lastRowLevelElementIsSimpleRow;
 
         public void Visit(Row rowElement)
         {
-            var row = sampleRowOulineLevels[outlineLevel];
+            var row = currentLevelSampleRow;
             using (new WriterScope(writer, row))
             {
-                var columnIndex = 0;
+                columnIndex = 0;
                 foreach (var cellElement in rowElement.Cells)
                 {
                     cellElement.Accept(this);
@@ -216,6 +281,7 @@ namespace JumboExcel
                 }
             }
             lastRowLevelElementIsSimpleRow = true;
+            rowIndex++;
         }
 
         public void Visit(RowGroup rowGroup)
@@ -224,18 +290,31 @@ namespace JumboExcel
                 throw new InvalidOperationException("Row group must follow a simple row element at the outline level.");
             if (outlineLevel >= 255)
                 throw new InvalidOperationException("Row ouline level overflow. Max row grouping level is 255.");
-            
-            outlineLevel ++;
+
+            var prevSampleRow = currentLevelSampleRow;
+            outlineLevel++;
             var groupChildCount = 0;
             foreach (var rowElement in rowGroup.RowElements)
             {
+                RowSlot slot;
                 if (sampleRowOulineLevels.Count < outlineLevel + 1)
                 {
-                    var sampleRow = new DocumentFormat.OpenXml.Spreadsheet.Row { OutlineLevel = (byte)outlineLevel};
-                    sampleRowOulineLevels.Add(sampleRow);
+                    slot = new RowSlot
+                    {
+                        regularRow = new DocumentFormat.OpenXml.Spreadsheet.Row { OutlineLevel = (byte)outlineLevel },
+                        hiddenRow = new DocumentFormat.OpenXml.Spreadsheet.Row { OutlineLevel = (byte)outlineLevel, Hidden = outlineLevel > 0 }
+                    };
+                    sampleRowOulineLevels.Add(slot);
                 }
+                else
+                {
+                    slot = sampleRowOulineLevels[outlineLevel];
+                }
+
+                currentLevelSampleRow = rowGroup.Collapse ? slot.hiddenRow : slot.regularRow;
+
                 rowElement.Accept(this);
-                groupChildCount ++;
+                groupChildCount++;
             }
 
             if (groupChildCount < 1)
@@ -243,6 +322,7 @@ namespace JumboExcel
 
             lastRowLevelElementIsSimpleRow = false;
             outlineLevel--;
+            currentLevelSampleRow = prevSampleRow;
         }
 
         public void VisitEmptyCell()
@@ -262,7 +342,7 @@ namespace JumboExcel
                     writer.WriteString(integerCell.Value.ToString());
             }
         }
-        
+
         public void Visit(DecimalCell decimalCell)
         {
             var sampleCell = decimalCell.Style.cellStyle == null ? sharedSampleNumberCell : cellStyleDefinitions.AllocateNumberCell(decimalCell.Style, CellValues.Number);
@@ -316,6 +396,33 @@ namespace JumboExcel
                 if (booleanCell.Value.HasValue)
                     writer.WriteString(booleanCell.Value.Value ? "1" : "0");
             }
+        }
+
+        public void Visit(CellMerger cellMerger)
+        {
+            cellMerger.InnerElement.Accept(this);
+            mergedCells.Add(new CellMergeInfo(new CellRef(cellMerger.GetAnchorRow(rowIndex), cellMerger.GetAnchorColumn(columnIndex)), new CellRef(rowIndex, columnIndex)));
+        }
+
+        /// <summary>
+        /// Gets the Excel representation of the cell range relative to the worksheet.
+        /// </summary>
+        /// <param name="upperLeft">Upper left cell's address in Excel format.</param>
+        /// <param name="lowerRight">Lower Right cell's address in Excel format.</param>
+        static string Range(string upperLeft, string lowerRight)
+        {
+            return upperLeft + ":" + lowerRight;
+        }
+
+        /// <summary>
+        /// Gets the Excel representation of the cell address relative to the worksheet.
+        /// </summary>
+        /// <param name="row">Zero based row index.</param>
+        /// <param name="column">Zero based column index.</param>
+        /// <returns>Returns the address of the cell in the Excel format <code>ABC123</code></returns>
+        static string CellRef(int row, int column)
+        {
+            return ExcelHelper.CellRef(row, column);
         }
     }
 }

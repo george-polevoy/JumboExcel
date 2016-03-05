@@ -8,6 +8,7 @@ using DocumentFormat.OpenXml.Spreadsheet;
 using JumboExcel.Formatting;
 using JumboExcel.Styling;
 using JumboExcel.Structure;
+using Alignment = DocumentFormat.OpenXml.Spreadsheet.Alignment;
 using Border = JumboExcel.Styling.Border;
 using CellStyle = JumboExcel.Styling.CellStyle;
 using Font = JumboExcel.Styling.Font;
@@ -67,7 +68,7 @@ namespace JumboExcel
 
         /// <summary>
         /// Writes <see cref="DocumentElement"/> hierarchy to the provided <see cref="Stream"/>.
-        /// This method is not thread safe. To provide thread safety, provide your own synchronization.
+        /// This method is thread safe.
         /// </summary>
         /// <param name="outputStream">Stream to write to.</param>
         /// <param name="worksheets">Worksheets for the excel document.</param>
@@ -78,7 +79,7 @@ namespace JumboExcel
 
         /// <summary>
         /// Writes <see cref="DocumentElement"/> hierarchy to the provided <see cref="Stream"/>.
-        /// This method is not thread safe. To provide thread safety, provide your own synchronization.
+        /// This method is thread safe.
         /// </summary>
         /// <param name="outputStream">Stream to write to.</param>
         /// <param name="worksheets">Worksheets for the excel document.</param>
@@ -91,7 +92,7 @@ namespace JumboExcel
         /// <summary>
         /// Writes <see cref="DocumentElement"/> hierarchy to the provided <see cref="Stream"/>.
         /// This method must not be reentered.
-        /// This method is not thread safe. To provide thread safety, provide your own synchronization.
+        /// This method is not thread safe.
         /// </summary>
         /// <param name="outputStream">Stream to write to.</param>
         /// <param name="worksheets">Worksheets for the excel document.</param>
@@ -119,11 +120,11 @@ namespace JumboExcel
                 AddSharedStyles(spreadsheetDocument, sharedStylesCollection);
             }
         }
-        
+
         /// <summary>
         /// Writes <see cref="DocumentElement"/> hierarchy to the provided <see cref="Stream"/>.
         /// This method must not be reentered.
-        /// This method is not thread safe. To provide thread safety, provide your own synchronization.
+        /// This method is not thread safe.
         /// </summary>
         /// <param name="outputStream">Stream to write to.</param>
         /// <param name="worksheets">Worksheets for the excel document.</param>
@@ -192,6 +193,12 @@ namespace JumboExcel
         /// <param name="workbookPart">Workbook part, representing entire document.</param>
         private static void AddWorksheetReferences(ICollection<Tuple<WorksheetPart, string>> worksheetParts, WorkbookPart workbookPart)
         {
+            var duplicateNames = worksheetParts.GroupBy(i => i.Item2).Select(g => new {name = g.Key, count = g.Count()}).Where(g => g.count > 1).ToList();
+            if (duplicateNames.Any())
+            {
+                throw new InvalidOperationException("Duplicate worksheet name encountered. Checkout Exception Data") {Data = { {"Duplicates", duplicateNames}}};
+            }
+
             if (worksheetParts.Count <= 0) return;
             using (var workbookPartWriter = OpenXmlWriter.Create(workbookPart))
             {
@@ -307,7 +314,18 @@ namespace JumboExcel
                     cellFormat.ApplyBorder = true;
                     break;
             }
-
+            if (style.Alignment != null)
+            {
+                var alignment = style.Alignment;
+                cellFormat.Alignment = new Alignment
+                {
+                    Horizontal = (HorizontalAlignmentValues)alignment.Horizontal,
+                    Vertical = (VerticalAlignmentValues)alignment.Vertical,
+                    TextRotation = (uint)alignment.TextRotation,
+                    WrapText = alignment.WrapText
+                };
+                cellFormat.ApplyAlignment = true;
+            }
             if (style.Format != null)
             {
                 cellFormat.ApplyNumberFormat = true;

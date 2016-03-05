@@ -16,9 +16,9 @@ namespace JumboExcel.Styling
         /// <summary>
         /// Constructor.
         /// </summary>
-        public NumberStyle(NumberFormat format, Font font, Border border, Color? fillColor = default (Color?))
+        public NumberStyle(NumberFormat format, Font font = null, Border border = Border.NONE, Color? fillColor = default (Color?), Alignment alignment = null)
         {
-            cellStyle = new CellStyle(font, border, fillColor, (format ?? NumberFormat.Default).FormatCode);
+            cellStyle = new CellStyle(font, border, fillColor, (format ?? NumberFormat.Default).FormatCode, alignment);
         }
     }
 }

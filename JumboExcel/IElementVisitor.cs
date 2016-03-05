@@ -17,5 +17,6 @@ namespace JumboExcel
         void Visit(InlineString inlineString);
         void Visit(SharedString sharedString);
         void Visit(BooleanCell booleanCell);
+        void Visit(CellMerger cellMerger);
     }
 }

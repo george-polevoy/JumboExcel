@@ -19,6 +19,9 @@ namespace JumboExcel
             var mediumColumns = new WorksheetParametersElement(false, false, Enumerable.Range(0, 20).Select(column => new ColumnConfiguration(column, column, 30)));
             var columnsForFonts = new WorksheetParametersElement(false, false, new ColumnConfiguration(0, 0, 50), new ColumnConfiguration(1, 1, 120));
 
+            var mergedCellStyle = new StringStyle(null, Border.ALL, Color.Beige);
+            var skippedMergedCell = new InlineString(null, mergedCellStyle);
+            var mergedCellPereferial = new InlineString("usual", new StringStyle(null, Border.NONE, Color.Bisque));
             TestHelper.WriteAndExecuteExcel(new[]
             {
                 new Worksheet("Data Types", mediumColumns, GetDataTypeRows()),
@@ -26,13 +29,46 @@ namespace JumboExcel
                 new Worksheet("Row Groupings", mediumColumns,
                     new Row(new SharedString("Level 1")),
                     new RowGroup(
-                        new Row(new SharedString("Level 2")),
-                        new RowGroup(
-                            new Row(new SharedString("Level 3"))),
-                        new Row(new SharedString("Level 2")),
-                        new RowGroup(
-                            new Row(new SharedString("Level 3"))))
-                    ),
+                        new RowLevelElement[] {
+                            new Row(new SharedString("Level 2")),
+                            new RowGroup(new[]{new Row(new SharedString("Level 3"))}, false),
+                            new Row(new SharedString("Level 2")),
+                            new RowGroup(new[]{new Row(new SharedString("Level 3"))}, false)
+                        }, false),
+                    new Row(new SharedString("Level 1")),
+                    new RowGroup(
+                        new RowLevelElement[] {
+                            new Row(new SharedString("Level 2")),
+                            new RowGroup(new[]{new Row(new SharedString("Level 3"))}, true),
+                            new Row(new SharedString("Level 2")),
+                            new RowGroup(new[]{new Row(new SharedString("Level 3"))}, true)
+                        }, true),
+                    new Row(new SharedString("Level 1")),
+                    new RowGroup(
+                        new RowLevelElement[] {
+                            new Row(new SharedString("Level 2")),
+                            new RowGroup(new[]{new Row(new SharedString("Level 3"))}, false),
+                            new Row(new SharedString("Level 2")),
+                            new RowGroup(new[]{new Row(new SharedString("Level 3"))}, false)
+                        }, false)),
+                new Worksheet(
+                    "Column groupings",
+                    new WorksheetParametersElement(true, true,
+                        new ColumnConfiguration(0, 1, 20, 2), // columns in the group of Fruit
+                        new ColumnConfiguration(2,2, 30, 1),  // a column in the group of Plant
+                        new ColumnConfiguration(3, 4, 20, 2), // columns in the group of Tree
+                        new ColumnConfiguration(5,5, 30, 1)  // a column in the group of Plant
+                        ),
+                    new Row(
+                        new SharedString(@"Plant\Fruit\Banana"), new SharedString(@"Plant\Fruit\Apple"), new SharedString(@"Plant\Fruit"),
+                        new SharedString(@"Plant\Tree\Pine"), new SharedString(@"Plant\Tree\Oak"), new SharedString(@"Plant\Tree"), new SharedString("Plant")), 
+                    new Row(new IntegerCell(1), new IntegerCell(3), new IntegerCell(4), new IntegerCell(10), new IntegerCell(30), new IntegerCell(40), new IntegerCell(44))),
+                new Worksheet("Merged cells",
+                    new WorksheetParametersElement(),
+                    new Row(Enumerable.Repeat(mergedCellPereferial, 5)),
+                    new Row(mergedCellPereferial, new SharedString("3 cols, 2 rows", mergedCellStyle), skippedMergedCell, skippedMergedCell, mergedCellPereferial),
+                    new Row(mergedCellPereferial, skippedMergedCell, skippedMergedCell, new RelativeCellMerger(skippedMergedCell, 1, 2), mergedCellPereferial),
+                    new Row(Enumerable.Repeat(mergedCellPereferial, 5))),
                 new Worksheet("Fonts", columnsForFonts, GetFontsRows()),
                 new Worksheet("Colors", mediumColumns, GetColorRows()),
                 new Worksheet("Border Styling", mediumColumns, GetBorderStylingRows()),

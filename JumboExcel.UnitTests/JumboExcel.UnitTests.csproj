@@ -48,6 +48,7 @@
     <Compile Include="CellStyleTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SharedStringTableTests.cs" />
+    <Compile Include="WorksheetWriteTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config">
