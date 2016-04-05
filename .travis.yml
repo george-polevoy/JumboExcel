@@ -1,2 +1,8 @@
 language: csharp
 solution: JumboExcel.sln
+install:
+  - nuget restore JumboExcel.sln
+  - nuget install NUnit.Runners -Version 2.6.4 -OutputDirectory testrunner
+script:
+  - xbuild /p:Configuration=Release JumboExcel.sln
+  - mono ./testrunner/NUnit.Runners.2.6.4/tools/nunit-console.exe ./JumboExcel.UnitTests/bin/Release/JumboExcel.UnitTests.dll
