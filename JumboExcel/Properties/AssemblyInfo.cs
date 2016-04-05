@@ -29,11 +29,12 @@ using System.Runtime.InteropServices;
 //      Build Number
 //      Revision
 //
-// You can specify all the values or you can default the Build and Revision Numbers 
+// You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.1.1.0")]
-[assembly: AssemblyFileVersion("1.1.1.0")]
+[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyInformationalVersion("1.0.0-alpha01-234")]
 
 [assembly: InternalsVisibleTo("JumboExcel.UnitTests")]
 [assembly: InternalsVisibleTo("JumboExcel.DemoTests")]
