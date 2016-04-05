@@ -34,7 +34,7 @@ using System.Runtime.InteropServices;
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
-[assembly: AssemblyInformationalVersion("1.0.0-alpha01-234")]
+[assembly: AssemblyInformationalVersion("1.0.0-alpha")]
 
 [assembly: InternalsVisibleTo("JumboExcel.UnitTests")]
 [assembly: InternalsVisibleTo("JumboExcel.DemoTests")]
