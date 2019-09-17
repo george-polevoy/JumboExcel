@@ -13,7 +13,4 @@
     <copyright>Copyright George Polevoy.</copyright>
     <tags>OpenXml Excel Performance GC-Friendly Linq async SAX DOM</tags>
   </metadata>
-  <files>
-    <file src="..\externals\OpenXml2.5\DocumentFormat.OpenXml.dll" target="lib\net40" />
-  </files>
 </package>

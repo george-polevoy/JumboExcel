@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("JumboExcel.DemoTests")]
-[assembly: AssemblyCopyright("Copyright © George Polevoy 2014")]
+[assembly: AssemblyCopyright("Copyright © George Polevoy 2019")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
