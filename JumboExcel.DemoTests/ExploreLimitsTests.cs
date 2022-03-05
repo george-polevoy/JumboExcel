@@ -58,7 +58,7 @@ namespace JumboExcel
             var timings = new Dictionary<Tuple<int,int>, long>();
             foreach (var h in ExploreUpperBound(h=> CanGenerateHeight(h, timings), 1))
             {
-                Console.WriteLine("Height {0} is ok.", h);
+                TestContext.WriteLine("Height {0} is ok.", h);
             }
 
             var timingsSummary =
@@ -168,7 +168,7 @@ namespace JumboExcel
                 sw.Stop();
                 if (sw.ElapsedMilliseconds > Timeout * 0.7)
                 {
-                    Console.WriteLine("Rows: {0}, Columns: {1}, File size: {2}", rows, columns, memoryStream.Length);
+                    TestContext.WriteLine("Rows: {0}, Columns: {1}, File size: {2}", rows, columns, memoryStream.Length);
                 }
             }
             
@@ -248,7 +248,7 @@ namespace JumboExcel
         {
             foreach (var testSize in GetTestSizes())
             {
-                Console.WriteLine(testSize);
+                TestContext.WriteLine(testSize);
             }
         }
 

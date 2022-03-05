@@ -50,7 +50,7 @@ namespace JumboExcel
                 foreach (var s in collection.DequeueAll())
                 {
                     count++;
-                    Console.WriteLine(s);
+                    TestContext.WriteLine(s);
                 }
                 Assert.Fail("Should not be able to reach this point.");
             }
@@ -70,7 +70,7 @@ namespace JumboExcel
             {
             }
 
-            Console.WriteLine(count);
+            TestContext.WriteLine(count);
         }
     }
 }

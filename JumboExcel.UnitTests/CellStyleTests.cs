@@ -39,7 +39,7 @@ namespace JumboExcel
 
             var items = q.ToArray();
 
-            Console.WriteLine(items.Length);
+            TestContext.WriteLine(items.Length);
 
             foreach (var left in items)
             {
@@ -60,7 +60,7 @@ namespace JumboExcel
             }
 
             var distinctHashCodes = items.Select(i => i.GetHashCode()).Distinct().Count();
-            Console.WriteLine("Inequal items count: {0}, Distinct hash codes: {1}", items.Length, distinctHashCodes);
+            TestContext.WriteLine("Inequal items count: {0}, Distinct hash codes: {1}", items.Length, distinctHashCodes);
             Assert.IsTrue(distinctHashCodes > items.Length * 0.6);
         }
     }

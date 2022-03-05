@@ -19,12 +19,12 @@ namespace JumboExcel
             {
                 foreach (var iteration in OpenXmlBuilder.WriteWithProgress(outputStream, progressingWorksheets))
                 {
-                    Console.WriteLine("Progress: {0}", iteration);
+                    TestContext.WriteLine("Progress: {0}", iteration);
                 }
             }
             var fileSize = new FileInfo(fileName).Length;
-            Console.WriteLine("Size of the file generated: {0}", fileSize);
-            Console.WriteLine(fileName);
+            TestContext.WriteLine("Size of the file generated: {0}", fileSize);
+            TestContext.WriteLine(fileName);
 
             Process.Start(fileName);
         }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using JumboExcel.Structure;
+using NUnit.Framework;
 
 namespace JumboExcel
 {
@@ -11,7 +12,7 @@ namespace JumboExcel
         internal static void WriteAndExecuteExcel(IEnumerable<Worksheet> worksheetElements)
         {
             var fileName = WriteFile(worksheetElements);
-            Process.Start(fileName);
+            Process.Start(new ProcessStartInfo(fileName) { UseShellExecute = true });
         }
 
         internal static string WriteFile(IEnumerable<Worksheet> worksheetElements)
@@ -25,8 +26,8 @@ namespace JumboExcel
                     );
             }
             var fileSize = new FileInfo(fileName).Length;
-            Console.WriteLine("Size of the file generated: {0}", fileSize);
-            Console.WriteLine(fileName);
+            TestContext.WriteLine("Size of the file generated: {0}", fileSize);
+            TestContext.WriteLine(fileName);
             return fileName;
         }
     }
