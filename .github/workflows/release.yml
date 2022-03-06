@@ -26,6 +26,8 @@ jobs:
           /p:PackageId=${CUSTOM_NUGET_PACKAGENAME}
           --no-build
           --output ./output
+        env:
+          CUSTOM_NUGET_PACKAGENAME: ${{ secrets.CUSTOM_NUGET_PACKAGENAME }}
       - name: Push
         run:
           dotnet nuget push
@@ -37,4 +39,3 @@ jobs:
           CUSTON_NUGET_APIKEY: ${{ secrets.CUSTON_NUGET_APIKEY }}
           CUSTOM_NUGET_SOURCE: ${{ secrets.CUSTOM_NUGET_SOURCE }} #https://nuget.pkg.github.com/OWNER/index.json
           CUSTOM_NUGET_REPOSITORYURL: ${{ secrets.CUSTOM_NUGET_REPOSITORYURL }}
-          CUSTOM_NUGET_PACKAGENAME: ${{ secrets.CUSTOM_NUGET_PACKAGENAME }}
