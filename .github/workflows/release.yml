@@ -24,18 +24,19 @@ jobs:
           --configuration Release
           /p:Version=${VERSION}
           /p:PackageId=${CUSTOM_NUGET_PACKAGENAME}
+          /p:RepositoryUrl=${CUSTOM_NUGET_REPOSITORYURL}
           --no-build
           --output ./output
         env:
           CUSTOM_NUGET_PACKAGENAME: ${{ secrets.CUSTOM_NUGET_PACKAGENAME }}
+          CUSTOM_NUGET_REPOSITORYURL: ${{ secrets.CUSTOM_NUGET_REPOSITORYURL }}
       - name: Push
         run:
           dotnet nuget push
           ./output/*.nupkg
           --source ${CUSTOM_NUGET_SOURCE}
           --api-key ${CUSTON_NUGET_APIKEY}
-          -p:RepositoryUrl=${CUSTOM_NUGET_REPOSITORYURL}
         env:
           CUSTON_NUGET_APIKEY: ${{ secrets.CUSTON_NUGET_APIKEY }}
           CUSTOM_NUGET_SOURCE: ${{ secrets.CUSTOM_NUGET_SOURCE }} #https://nuget.pkg.github.com/OWNER/index.json
-          CUSTOM_NUGET_REPOSITORYURL: ${{ secrets.CUSTOM_NUGET_REPOSITORYURL }}
+
