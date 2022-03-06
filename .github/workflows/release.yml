@@ -23,7 +23,7 @@ jobs:
           dotnet pack
           --configuration Release
           /p:Version=${VERSION}
-          /p:PackageId=$
+          /p:PackageId=${CUSTOM_NUGET_PACKAGENAME}
           --no-build
           --output ./output
       - name: Push
