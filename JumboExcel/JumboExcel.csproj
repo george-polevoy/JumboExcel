@@ -1,6 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <PackageId>JumboExcel</PackageId>
+    <PackageTags>OpenXml Excel Performance GC-Friendly Linq async SAX DOM</PackageTags>
+    <PackageProjectUrl>https://github.com/george-polevoy/JumboExcel</PackageProjectUrl>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <Description>JumboExcel - Performant and easy to use OpenXml export framework for .NET</Description>
+    <Title>JumboExcel</Title>
+    <Authors>georgepolevoy</Authors>
+    <Copyright>George Polevoy</Copyright>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/george-polevoy/JumboExcel.git</RepositoryUrl>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="DocumentFormat.OpenXml" Version="2.15.0" />
