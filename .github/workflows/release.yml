@@ -25,6 +25,7 @@ jobs:
           /p:Version=${VERSION}
           /p:PackageId=${CUSTOM_NUGET_PACKAGENAME}
           /p:RepositoryUrl=${CUSTOM_NUGET_REPOSITORYURL}
+          /p:IncludeSymbols=true
           --no-build
           --output ./output
         env:
