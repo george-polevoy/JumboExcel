@@ -37,10 +37,6 @@ jobs:
           dotnet nuget push ./output/*.nupkg
           --source ${CUSTOM_NUGET_SOURCE}
           --api-key ${CUSTON_NUGET_APIKEY}
-          &&
-          dotnet nuget push ./output/*.snupkg
-          --source ${CUSTOM_NUGET_SOURCE}
-          --api-key ${CUSTON_NUGET_APIKEY}
         env:
           CUSTON_NUGET_APIKEY: ${{ secrets.CUSTON_NUGET_APIKEY }}
           CUSTOM_NUGET_SOURCE: ${{ secrets.CUSTOM_NUGET_SOURCE }} #https://nuget.pkg.github.com/OWNER/index.json
