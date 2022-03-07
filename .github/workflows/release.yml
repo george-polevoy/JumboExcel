@@ -26,16 +26,19 @@ jobs:
           /p:PackageId=${CUSTOM_NUGET_PACKAGENAME}
           /p:RepositoryUrl=${CUSTOM_NUGET_REPOSITORYURL}
           /p:IncludeSymbols=true
+          /p:SymbolPackageFormat=snupkg
           --no-build
           --output ./output
         env:
           CUSTOM_NUGET_PACKAGENAME: ${{ secrets.CUSTOM_NUGET_PACKAGENAME }}
           CUSTOM_NUGET_REPOSITORYURL: ${{ secrets.CUSTOM_NUGET_REPOSITORYURL }}
       - name: Push
-        #workaround https://github.com/NuGet/Home/issues/4393
         run:
-          find ./output -name '*.nupkg' | xargs -I '{}'
-          dotnet nuget push {}
+          dotnet nuget push ./output/*.nupkg
+          --source ${CUSTOM_NUGET_SOURCE}
+          --api-key ${CUSTON_NUGET_APIKEY}
+          &&
+          dotnet nuget push ./output/*.snupkg
           --source ${CUSTOM_NUGET_SOURCE}
           --api-key ${CUSTON_NUGET_APIKEY}
         env:
