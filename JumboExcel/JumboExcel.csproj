@@ -7,6 +7,7 @@
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <Description>JumboExcel - Performant and easy to use OpenXml export framework for .NET</Description>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Title>JumboExcel</Title>
     <Authors>georgepolevoy</Authors>
     <Copyright>George Polevoy</Copyright>
