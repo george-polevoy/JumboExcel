@@ -32,8 +32,9 @@ jobs:
           CUSTOM_NUGET_PACKAGENAME: ${{ secrets.CUSTOM_NUGET_PACKAGENAME }}
           CUSTOM_NUGET_REPOSITORYURL: ${{ secrets.CUSTOM_NUGET_REPOSITORYURL }}
       - name: Push
+        #workaround https://github.com/NuGet/Home/issues/4393
         run:
-          find ./output -name '*.nupkg' | xargs -I '{}' #workaround https://github.com/NuGet/Home/issues/4393
+          find ./output -name '*.nupkg' | xargs -I '{}'
           dotnet nuget push {}
           --source ${CUSTOM_NUGET_SOURCE}
           --api-key ${CUSTON_NUGET_APIKEY}
