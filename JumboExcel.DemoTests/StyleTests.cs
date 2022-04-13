@@ -91,7 +91,8 @@ namespace JumboExcel
                 new Worksheet("Wrap text", new WorksheetParametersElement(false, false),
                     new Row(new SharedString("This is a wide string that should be wrapped.", CreateWrappedStringStyle()), new SharedString("This is a wide string that should be wrapped.", CreateWrappedStringStyle()), new SharedString("This is a wide string that is not wrapped.")),
                     new Row(new SharedString("This is a wide string that should not be wrapped."), new SharedString("This is a wide string that should not be wrapped."))
-                    )
+                    ),
+                new Worksheet("This is a long worksheet name. More than 32 characters for sure.", new WorksheetParametersElement(false, false, null, null, WorksheetCompatibilityFlags.RELAX_WORKSHEET_LENGTH_CONSTRAINT))
             });
         }
 
