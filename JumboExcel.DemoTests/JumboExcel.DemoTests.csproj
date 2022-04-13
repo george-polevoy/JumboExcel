@@ -2,6 +2,7 @@
   <PropertyGroup>
     <IsPackable>false</IsPackable>
     <TargetFrameworks>net6.0</TargetFrameworks>
+    <RootNamespace>JumboExcel</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\JumboExcel\JumboExcel.csproj" />

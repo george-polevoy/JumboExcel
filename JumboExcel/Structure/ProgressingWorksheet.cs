@@ -52,7 +52,8 @@ namespace JumboExcel.Structure
                 throw new ArgumentNullException("rowGenerator");
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentNullException("name");
-            if (name.Length > MaxNameLength)
+            var flags = parameters?.Flags;
+            if ((flags & WorksheetCompatibilityFlags.RELAX_WORKSHEET_LENGTH_CONSTRAINT) == 0 && name.Length > MaxNameLength)
                 throw new ArgumentOutOfRangeException("name", name, "Name length must be < 32");
             RowGenerator = rowGenerator;
             Name = name;

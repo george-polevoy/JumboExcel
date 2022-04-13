@@ -28,6 +28,11 @@ namespace JumboExcel.Structure
         /// Specifies, if the summary columns are at the right of grouped columns (Grouped collumns are not supported in this implementation).
         /// </summary>
         public bool Right { get; private set; }
+        
+        /// <summary>
+        /// Various flags affecting compatibility.
+        /// </summary>
+        public WorksheetCompatibilityFlags Flags { get; }
 
         /// <summary>
         /// Default constructor.
@@ -50,6 +55,22 @@ namespace JumboExcel.Structure
             ColumnConfigurations = columnConfigurations ?? Enumerable.Empty<ColumnConfiguration>();
             PaneFreezer = paneFreezer;
         }
+        
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="belo">Specifies if the summary rows are belo the grouped rows.</param>
+        /// <param name="right">Specifies, if the summary columns are at the right of grouped columns (Grouped collumns are not supported in this implementation).</param>
+        /// <param name="columnConfigurations">Column configurations. Can be <code>null</code>.</param>
+        /// <param name="paneFreezer">Frozen panes. Can be <code>null</code>.</param>
+        public WorksheetParametersElement(bool belo, bool right, IEnumerable<ColumnConfiguration> columnConfigurations, PaneFreezer paneFreezer, WorksheetCompatibilityFlags flags)
+        {
+            Belo = belo;
+            Right = right;
+            ColumnConfigurations = columnConfigurations ?? Enumerable.Empty<ColumnConfiguration>();
+            PaneFreezer = paneFreezer;
+            Flags = flags;
+        }
 
         /// <summary>
         /// Constructor.
@@ -58,7 +79,7 @@ namespace JumboExcel.Structure
         /// <param name="right">Specifies, if the summary columns are at the right of grouped columns (Grouped collumns are not supported in this implementation).</param>
         /// <param name="columnConfigurations">Column configurations.</param>
         public WorksheetParametersElement(bool belo, bool right, params ColumnConfiguration[] columnConfigurations)
-            : this(belo, right, columnConfigurations, null)
+            : this(belo, right, columnConfigurations, null, WorksheetCompatibilityFlags.NONE)
         {
         }
     }
@@ -77,7 +98,8 @@ namespace JumboExcel.Structure
         {
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentNullException("name");
-            if (name.Length > MAX_NAME_LENGTH)
+            var flags = parameters?.Flags ?? WorksheetCompatibilityFlags.NONE;
+            if ((flags & WorksheetCompatibilityFlags.RELAX_WORKSHEET_LENGTH_CONSTRAINT) == 0 && name.Length > MAX_NAME_LENGTH)
                 throw new ArgumentOutOfRangeException("name", name, "Name length must be < 32");
             Name = name;
             Parameters = parameters;
