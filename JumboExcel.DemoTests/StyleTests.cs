@@ -196,11 +196,19 @@ namespace JumboExcel
                 }
             }
             var dateValue = new DateTime(2014, 12, 29, 16, 35, 56).AddMilliseconds(125);
-            var customDateFormats = new[] { default(DateTimeFormat), new DateTimeFormat("m/d/yy H:mm:ss") };
+            var customDateFormats = new[]
+            {
+                default(DateTimeFormat),
+                new DateTimeFormat("m/d/yy H:mm:ss"),
+                new DateTimeFormat("dd.MM.yyyy"),
+                new DateTimeFormat("hh:mm:ss"),
+            };
             foreach (var format in DateTimeFormat.GetDateTimeFormats().Concat(customDateFormats))
             {
                 yield return RowForType(new DateTimeCell(dateValue, new DateStyle(format, null, Border.NONE, null)), GetValueFormatComment(format, dateValue.ToString("u")));
             }
+
+            yield return TimeSpanRow("[h]:mm");
 
             yield return RowForType(new BooleanCell(null), "Null boolean without style.");
             yield return RowForType(new BooleanCell(true), "True boolean without style.");
@@ -208,6 +216,14 @@ namespace JumboExcel
             yield return RowForType(new BooleanCell(null, new BooleanStyle(null, Border.NONE, Color.SkyBlue)), "Null boolean styled.");
             yield return RowForType(new BooleanCell(true, new BooleanStyle(null, Border.NONE, Color.SkyBlue)), "True boolean styled.");
             yield return RowForType(new BooleanCell(false, new BooleanStyle(null, Border.NONE, Color.SkyBlue)), "False boolean styled.");
+        }
+
+        private static Row TimeSpanRow(string customTimeFormatString)
+        {
+            var customTimeValue = DateTime.FromOADate(0).AddHours(36).AddMinutes(13);
+            var customTimeFormat = new DateTimeFormat(customTimeFormatString);
+            var customDateStyle = new DateStyle(customTimeFormat, null, Border.NONE, null);
+            return RowForType(new DateTimeCell(customTimeValue, customDateStyle), GetValueFormatComment(customTimeFormat, customTimeValue.ToString("u")));
         }
 
         private static string GetNoStyleComment(string value)
