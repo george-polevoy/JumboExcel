@@ -178,7 +178,11 @@ namespace JumboExcel
         {
             if (sharedStrings.Count <= 0) return;
             var sharedStringTablePart = spreadsheetDocument.WorkbookPart.AddNewPart<SharedStringTablePart>();
-            var sharedStringTable = new SharedStringTable();
+            var sharedStringTable = new SharedStringTable()
+            {
+                Count = new UInt32Value((uint)sharedStrings.Count),
+                UniqueCount = new UInt32Value((uint)sharedStrings.Count)
+            };
             sharedStringTablePart.SharedStringTable = sharedStringTable;
             foreach (var text in sharedStrings.DequeueAll())
             {
@@ -250,24 +254,28 @@ namespace JumboExcel
                     borderDefinitions.GetOrAllocateElement(style.Border);
             }
             var numberFormatsCount = defaultNumberingFormats.Length + customNumberFormats.Count;
+            var fontDefinitionsCount = defaultFonts.Length + fontDefinitions.Count;
+            var fillDefinitionsCount = defaultFills.Length + fillDefinitions.Count;
+            var borderDefinitionsCount = defaultBorders.Length + borderDefinitions.Count;
+            var cellFormatCount = sharedStylesCollection.Count + sharedStylesCollection.Count;
             return new Stylesheet(
                 new NumberingFormats(defaultNumberingFormats.Concat(
                     customNumberFormats.GetAll().Select((formatCode, index) => new NumberingFormat {NumberFormatId = (uint) (BASE_CUSTOM_FORMAT_ID + index), FormatCode = formatCode})
                     )) {Count = (uint) numberFormatsCount},
                 new Fonts(defaultFonts.Concat(
-                    fontDefinitions.GetAll().Select(CreateFont))),
+                    fontDefinitions.GetAll().Select(CreateFont))) { Count = (uint)fontDefinitionsCount },
                 new Fills(defaultFills.Concat(
                     fillDefinitions.GetAll().Select(fill => new Fill(new PatternFill(
                         new ForegroundColor {Rgb = new HexBinaryValue {Value = ToHex(fill)}}
                         ) {PatternType = PatternValues.Solid}))
-                    )),
+                    )) { Count = (uint)fillDefinitionsCount },
                 new Borders(defaultBorders.Concat(
                     borderDefinitions.GetAll().Select(CreateBorder)
-                    )),
+                    )) { Count = (uint)borderDefinitionsCount },
                 new CellFormats(defaultCellFormats.Concat(
                     sharedStylesCollection.DequeueAll().Select(
                     style => CreateCellFormat(style, fontDefinitions, fillDefinitions, borderDefinitions, commonNumberFormats, customNumberFormats))
-                    ))
+                    )) { Count = (uint)cellFormatCount }
                 );
         }
 

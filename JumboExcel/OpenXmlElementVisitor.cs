@@ -193,12 +193,24 @@ namespace JumboExcel
 
         public void Visit(Worksheet worksheet)
         {
-            using (new WriterScope(writer, new DocumentFormat.OpenXml.Spreadsheet.Worksheet()))
+            // using (new WriterScope(writer, new DocumentFormat.OpenXml.Spreadsheet.Worksheet(), new (string key, string reference)[]
+            //        {
+            //            ("", "http://schemas.openxmlformats.org/spreadsheetml/2006/main")
+            //        }))
+            using (new WriterScope(writer, new DocumentFormat.OpenXml.Spreadsheet.Worksheet()))  
             {
                 var worksheetParametersElement = worksheet.Parameters;
                 if (worksheetParametersElement != null)
                 {
                     WriteWorksheetParameters(worksheetParametersElement);
+                }
+
+                using (new WriterScope(writer, new SheetViews()))
+                {
+                    writer.WriteElement(new SheetView
+                    {
+                        WorkbookViewId = 0
+                    });
                 }
 
                 using (new WriterScope(writer, new SheetData()))

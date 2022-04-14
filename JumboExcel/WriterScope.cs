@@ -1,5 +1,8 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Office2019.Excel.RichData;
 
 namespace JumboExcel
 {
@@ -22,6 +25,12 @@ namespace JumboExcel
         {
             this.writer = writer;
             writer.WriteStartElement(element);
+        }
+
+        public WriterScope(OpenXmlWriter writer, OpenXmlElement element, IEnumerable<(string key, string reference)> namespaces)
+        {
+            this.writer = writer;
+            writer.WriteStartElement(element, Enumerable.Empty<OpenXmlAttribute>(), namespaces.Select(n => new KeyValuePair<string, string>(n.key, n.reference)));
         }
 
         public void Dispose()
