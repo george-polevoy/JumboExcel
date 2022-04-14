@@ -1,4 +1,6 @@
+using System.Drawing;
 using JumboExcel.Structure;
+using JumboExcel.Styling;
 using NUnit.Framework;
 
 namespace JumboExcel;
@@ -12,7 +14,8 @@ public class SimpleFileTest
             {
                 new("Sheet 1", null,
                     new Row(
-                        new SharedString("Cell A1"), new SharedString("Cell A2")))
+                        new InlineString("Cell A1", new StringStyle(new Font(null, 20, Color.Black, FontSlope.ITALIC, FontWeight.BOLD))), new SharedString("Cell A2"))),
+                new("Sheet 2", null, new Row(new SharedString("Hello")))
             }
         );
     }
