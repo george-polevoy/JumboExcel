@@ -257,7 +257,7 @@ namespace JumboExcel
             var fontDefinitionsCount = defaultFonts.Length + fontDefinitions.Count;
             var fillDefinitionsCount = defaultFills.Length + fillDefinitions.Count;
             var borderDefinitionsCount = defaultBorders.Length + borderDefinitions.Count;
-            var cellFormatCount = sharedStylesCollection.Count + sharedStylesCollection.Count;
+            var cellFormatCount = defaultCellFormats.Length + sharedStylesCollection.Count;
             return new Stylesheet(
                 new NumberingFormats(defaultNumberingFormats.Concat(
                     customNumberFormats.GetAll().Select((formatCode, index) => new NumberingFormat {NumberFormatId = (uint) (BASE_CUSTOM_FORMAT_ID + index), FormatCode = formatCode})
