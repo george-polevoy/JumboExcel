@@ -21,8 +21,8 @@ namespace JumboExcel
 
             var mergedCellStyle = new StringStyle(null, Border.ALL, Color.Beige);
             var skippedMergedCell = new InlineString(null, mergedCellStyle);
-            var mergedCellPereferial = new InlineString("usual", new StringStyle(null, Border.NONE, Color.Bisque));
-            TestHelper.WriteAndExecuteExcel(new[]
+            var mergedCellPeripheral = new InlineString("usual", new StringStyle(null, Border.NONE, Color.Bisque));
+            var worksheetElements = new[]
             {
                 new Worksheet("Data Types", mediumColumns, GetDataTypeRows()),
                 new Worksheet("Frozen Panes", new WorksheetParametersElement(false, false, null, new PaneFreezer(1, 1)), SampleDataSources.GetMultiplicationTableCells(40, 60).Select(r => new Row(r))),
@@ -59,17 +59,17 @@ namespace JumboExcel
                         new ColumnConfiguration(2,2, 30, 1),  // a column in the group of Plant
                         new ColumnConfiguration(3, 4, 20, 2), // columns in the group of Tree
                         new ColumnConfiguration(5,5, 30, 1)  // a column in the group of Plant
-                        ),
+                    ),
                     new Row(
                         new SharedString(@"Plant\Fruit\Banana"), new SharedString(@"Plant\Fruit\Apple"), new SharedString(@"Plant\Fruit"),
                         new SharedString(@"Plant\Tree\Pine"), new SharedString(@"Plant\Tree\Oak"), new SharedString(@"Plant\Tree"), new SharedString("Plant")), 
                     new Row(new IntegerCell(1), new IntegerCell(3), new IntegerCell(4), new IntegerCell(10), new IntegerCell(30), new IntegerCell(40), new IntegerCell(44))),
                 new Worksheet("Merged cells",
                     new WorksheetParametersElement(),
-                    new Row(Enumerable.Repeat(mergedCellPereferial, 5)),
-                    new Row(mergedCellPereferial, new SharedString("3 cols, 2 rows", mergedCellStyle), skippedMergedCell, skippedMergedCell, mergedCellPereferial),
-                    new Row(mergedCellPereferial, skippedMergedCell, skippedMergedCell, new RelativeCellMerger(skippedMergedCell, 1, 2), mergedCellPereferial),
-                    new Row(Enumerable.Repeat(mergedCellPereferial, 5))),
+                    new Row(Enumerable.Repeat(mergedCellPeripheral, 5)),
+                    new Row(mergedCellPeripheral, new SharedString("3 cols, 2 rows", mergedCellStyle), skippedMergedCell, skippedMergedCell, mergedCellPeripheral),
+                    new Row(mergedCellPeripheral, skippedMergedCell, skippedMergedCell, new RelativeCellMerger(skippedMergedCell, 1, 2), mergedCellPeripheral),
+                    new Row(Enumerable.Repeat(mergedCellPeripheral, 5))),
                 new Worksheet("Fonts", columnsForFonts, GetFontsRows()),
                 new Worksheet("Colors", mediumColumns, GetColorRows()),
                 new Worksheet("Border Styling", mediumColumns, GetBorderStylingRows()),
@@ -91,8 +91,15 @@ namespace JumboExcel
                 new Worksheet("Wrap text", new WorksheetParametersElement(false, false),
                     new Row(new SharedString("This is a wide string that should be wrapped.", CreateWrappedStringStyle()), new SharedString("This is a wide string that should be wrapped.", CreateWrappedStringStyle()), new SharedString("This is a wide string that is not wrapped.")),
                     new Row(new SharedString("This is a wide string that should not be wrapped."), new SharedString("This is a wide string that should not be wrapped."))
-                    )
-            });
+                )
+            };
+            TestHelper.WriteAndExecuteExcel(worksheetElements, "AllStyles_");
+            foreach (var worksheet in worksheetElements)
+            {
+                TestHelper.WriteFile(
+                    Enumerable.Repeat(worksheet, 1), worksheet.Name.Replace(' ', '_') + "_"
+                    );
+            }
         }
 
         static StringStyle CreateWrappedStringStyle()

@@ -9,15 +9,15 @@ namespace JumboExcel
 {
     static class TestHelper
     {
-        internal static void WriteAndExecuteExcel(IEnumerable<Worksheet> worksheetElements)
+        internal static void WriteAndExecuteExcel(IEnumerable<Worksheet> worksheetElements, string prefix = "")
         {
-            var fileName = WriteFile(worksheetElements);
+            var fileName = WriteFile(worksheetElements, prefix);
             Process.Start(new ProcessStartInfo(fileName) { UseShellExecute = true });
         }
 
-        internal static string WriteFile(IEnumerable<Worksheet> worksheetElements)
+        internal static string WriteFile(IEnumerable<Worksheet> worksheetElements, string prefix = "")
         {
-            var fileName = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".xlsx");
+            var fileName = Path.Combine(Path.GetTempPath(), prefix + Guid.NewGuid() + ".xlsx");
             using (var outputStream = new FileStream(fileName, FileMode.CreateNew))
             {
                 OpenXmlBuilder.Write(
@@ -25,8 +25,6 @@ namespace JumboExcel
                     worksheetElements
                     );
             }
-            var fileSize = new FileInfo(fileName).Length;
-            TestContext.WriteLine("Size of the file generated: {0}", fileSize);
             TestContext.WriteLine(fileName);
             return fileName;
         }
