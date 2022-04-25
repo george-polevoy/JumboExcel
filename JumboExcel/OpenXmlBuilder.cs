@@ -217,9 +217,9 @@ namespace JumboExcel
         /// </summary>
         /// <param name="color">Color.</param>
         /// <returns>Returns hexadecimal string representation of the color.</returns>
-        private static string ToHex(System.Drawing.Color color)
+        internal static string ToHexColor(System.Drawing.Color color)
         {
-            return (color.ToArgb() & 0x00FFFFFF).ToString("X");
+            return (color.ToArgb() & 0x00FFFFFF).ToString("X6");
         }
 
         /// <summary>
@@ -258,7 +258,7 @@ namespace JumboExcel
                     fontDefinitions.GetAll().Select(CreateFont))),
                 new Fills(defaultFills.Concat(
                     fillDefinitions.GetAll().Select(fill => new Fill(new PatternFill(
-                        new ForegroundColor {Rgb = new HexBinaryValue {Value = ToHex(fill)}}
+                        new ForegroundColor {Rgb = new HexBinaryValue {Value = ToHexColor(fill)}}
                         ) {PatternType = PatternValues.Solid}))
                     )),
                 new Borders(defaultBorders.Concat(
@@ -377,7 +377,7 @@ namespace JumboExcel
                 elements.Add(new FontName { Val = font.Typeface });
             elements.Add(new FontSize { Val = (double)font.Size });
             var color = font.Color;
-            elements.Add(new Color { Rgb = new HexBinaryValue { Value = ToHex(color) } });
+            elements.Add(new Color { Rgb = new HexBinaryValue { Value = ToHexColor(color) } });
             return new DocumentFormat.OpenXml.Spreadsheet.Font(elements);
         }
     }

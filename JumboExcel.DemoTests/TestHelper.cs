@@ -25,7 +25,8 @@ namespace JumboExcel
                     worksheetElements
                     );
             }
-            TestContext.WriteLine(fileName);
+
+            TestContext.WriteLine($"cp {fileName} .");
             return fileName;
         }
     }
